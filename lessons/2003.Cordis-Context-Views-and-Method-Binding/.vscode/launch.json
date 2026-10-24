@@ -19,7 +19,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
+      },
+      "pauseForSourceMap": true
     },
     {
       "name": "Cordis 2003 · M1.2.2 · shadow 与 extend",
@@ -39,7 +40,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
+      },
+      "pauseForSourceMap": true
     },
     {
       "name": "Cordis 2003 · M1.2.3 · shadow 应用场景",
@@ -59,7 +61,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
+      },
+      "pauseForSourceMap": true
     }
   ]
 }

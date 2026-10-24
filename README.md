@@ -10,7 +10,7 @@ ReportDesk 从文本生成 Markdown 报告，逐步加入可复用服务、完�
 
 - **直接阅读**：点击下方课名，在 GitHub 阅读包含讲解、代码和图的正文。
 - **边读边运行**：每课的 `LearningTask.ipynb` 使用 JavaScript（jslab）内核；初始化与实验按正文顺序执行。
-- **设置断点**：单独用 VS Code 打开某一课目录，使用本课 `.vscode/launch.json`，可进入 `materials/cordis/src/`。
+- **设置断点**：用 VS Code 打开仓库根目录，选择对应课次的调试配置并按 F5；也可单独打开任意一课。14 课均配有入口，可进入本课 `materials/cordis/src/`。准备步骤见 [VS Code 调试](SETUP.md#vs-code-调试)。
 
 完整安装与 Notebook 配置见 [SETUP.md](SETUP.md)。从第 1 课开始运行：
 

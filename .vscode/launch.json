@@ -1,0 +1,501 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2001 · 01 · Context 与函数插件",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2001.Cordis-Context-and-Function-Plugins/examples/01-function-plugin.ts",
+      "cwd": "${workspaceFolder}/lessons/2001.Cordis-Context-and-Function-Plugins",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2001 · 02 · 插件登记与两次独立装载",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2001.Cordis-Context-and-Function-Plugins/examples/02-plugin-and-fiber.ts",
+      "cwd": "${workspaceFolder}/lessons/2001.Cordis-Context-and-Function-Plugins",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2001 · 03 · 等待异步插件完成",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2001.Cordis-Context-and-Function-Plugins/examples/03-await-plugin.ts",
+      "cwd": "${workspaceFolder}/lessons/2001.Cordis-Context-and-Function-Plugins",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2002 · 02 · 根 Context 装配与方法转发",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2002.Cordis-Root-Context-and-Method-Dispatch/scripts/lesson.mjs",
+      "cwd": "${workspaceFolder}/lessons/2002.Cordis-Root-Context-and-Method-Dispatch",
+      "args": [],
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2002 · 03 · Fiber.effect 的登记与清理",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2002.Cordis-Root-Context-and-Method-Dispatch/scripts/lesson.mjs",
+      "cwd": "${workspaceFolder}/lessons/2002.Cordis-Root-Context-and-Method-Dispatch",
+      "args": [
+        "--effect"
+      ],
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2003 · M1.2.1 · 分支与原型",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2003.Cordis-Context-Views-and-Method-Binding/examples/01-m1-context-branches.mjs",
+      "cwd": "${workspaceFolder}/lessons/2003.Cordis-Context-Views-and-Method-Binding",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2003 · M1.2.2 · shadow 与 extend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2003.Cordis-Context-Views-and-Method-Binding/examples/01-m1-shadow-extend.mjs",
+      "cwd": "${workspaceFolder}/lessons/2003.Cordis-Context-Views-and-Method-Binding",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2003 · M1.2.3 · shadow 应用场景",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2003.Cordis-Context-Views-and-Method-Binding/examples/02-shadow-application.mjs",
+      "cwd": "${workspaceFolder}/lessons/2003.Cordis-Context-Views-and-Method-Binding",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2004 · 01 · ReportDesk",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2004.Cordis-ReportDesk-First-Plugin/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2004.Cordis-ReportDesk-First-Plugin",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [
+        "--with-excerpt"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2004 · 01 · 建设起点",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2004.Cordis-ReportDesk-First-Plugin/examples/01-reportdesk/start.ts",
+      "cwd": "${workspaceFolder}/lessons/2004.Cordis-ReportDesk-First-Plugin",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2005 · 01 · 报告服务",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2005.Cordis-ReportDesk-Reusable-Service/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2005.Cordis-ReportDesk-Reusable-Service",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [
+        "{\"includeExcerpt\":true}"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2005 · 01 · 建设起点",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2005.Cordis-ReportDesk-Reusable-Service/examples/01-reportdesk/start.ts",
+      "cwd": "${workspaceFolder}/lessons/2005.Cordis-ReportDesk-Reusable-Service",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2006 · 01 · 事件、通知与统计",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2006.Cordis-ReportDesk-Events-and-Observers/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2006.Cordis-ReportDesk-Events-and-Observers",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [
+        "{\"includeExcerpt\":true}"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2006 · 01 · 建设起点",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2006.Cordis-ReportDesk-Events-and-Observers/examples/01-reportdesk/start.ts",
+      "cwd": "${workspaceFolder}/lessons/2006.Cordis-ReportDesk-Events-and-Observers",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2007 · 01 · 观察插件卸载与重装",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2007.Cordis-ReportDesk-Observer-Lifecycle/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2007.Cordis-ReportDesk-Observer-Lifecycle",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [
+        "{\"includeExcerpt\":true}"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2007 · 01 · 建设起点",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2007.Cordis-ReportDesk-Observer-Lifecycle/examples/01-reportdesk/start.ts",
+      "cwd": "${workspaceFolder}/lessons/2007.Cordis-ReportDesk-Observer-Lifecycle",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2008 · 01 · 存储依赖的停用与恢复",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2008.Cordis-ReportDesk-Storage-Dependency/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2008.Cordis-ReportDesk-Storage-Dependency",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2009 · 01 · 可插拔的格式处理",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2009.Cordis-ReportDesk-Format-Plugins/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2009.Cordis-ReportDesk-Format-Plugins",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2010 · 01 · 报告配置更新",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2010.Cordis-ReportDesk-Config-Update/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2010.Cordis-ReportDesk-Config-Update",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2011 · 01 · 共享服务与调用视图",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2011.Cordis-ReportDesk-Service-Views/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2011.Cordis-ReportDesk-Service-Views",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2012 · 01 · 方法调用与依赖上下文",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2012.Cordis-ReportDesk-Method-Context/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2012.Cordis-ReportDesk-Method-Context",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2013 · 01 · 两个独立工作区",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2013.Cordis-ReportDesk-Workspace-Isolation/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2013.Cordis-ReportDesk-Workspace-Isolation",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2014 · 01 · 完整流程与对象图解",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/lessons/2014.Cordis-ReportDesk-Full-Flow/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}/lessons/2014.Cordis-ReportDesk-Full-Flow",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "pauseForSourceMap": true
+    }
+  ]
+}

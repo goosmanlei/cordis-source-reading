@@ -19,7 +19,8 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "smartStep": false
+      "smartStep": false,
+      "pauseForSourceMap": true
     }
   ]
 }

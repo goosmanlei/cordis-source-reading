@@ -19,69 +19,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
-    }
-  ],
-  "inputs": [
-    {
-      "id": "cordis2009SyntaxEntry",
-      "type": "pickString",
-      "description": "选择 M3 语法示例；编号对应 Notebook",
-      "options": [
-        {
-          "label": "02 · 调用方式与 this",
-          "value": "examples/02-call-apply-bind.cjs"
-        },
-        {
-          "label": "02 · 补充 · this、重复 bind 与 new",
-          "value": "examples/02-this-binding-notes.cjs"
-        },
-        {
-          "label": "03 · ES2015 常用写法",
-          "value": "examples/03-modern-bindings.cjs"
-        },
-        {
-          "label": "04 · 类与继承",
-          "value": "examples/04-classes.cjs"
-        },
-        {
-          "label": "04 · 补充 · 私有方法与子类访问边界",
-          "value": "examples/04-private-members-notes.cjs"
-        },
-        {
-          "label": "05 · Proxy 函数调用与构造",
-          "value": "examples/05-proxy-invocation.cjs"
-        },
-        {
-          "label": "05 · 补充 · newTarget 与实例原型",
-          "value": "examples/05-construct-new-target-notes.cjs"
-        },
-        {
-          "label": "06 · Proxy 属性读取与 receiver",
-          "value": "examples/06-proxy-properties.cjs"
-        },
-        {
-          "label": "07 · Symbol、集合与生成器",
-          "value": "examples/07-symbol-iteration.cjs"
-        },
-        {
-          "label": "08 · Promise 与 async/await",
-          "value": "examples/08-promises-async.mjs"
-        },
-        {
-          "label": "09 · ES modules",
-          "value": "examples/09-modules/main.mjs"
-        },
-        {
-          "label": "10 · 后续常见运算符",
-          "value": "examples/10-later-operators.cjs"
-        },
-        {
-          "label": "11 · TypeScript 类型与运行值",
-          "value": "examples/11-typescript.ts"
-        }
-      ],
-      "default": "examples/05-proxy-invocation.cjs"
+      },
+      "pauseForSourceMap": true
     }
   ]
 }

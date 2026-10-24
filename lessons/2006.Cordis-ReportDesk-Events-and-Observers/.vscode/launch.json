@@ -22,7 +22,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
+      },
+      "pauseForSourceMap": true
     },
     {
       "name": "Cordis 2006 · 01 · 建设起点",
@@ -43,7 +44,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
+      },
+      "pauseForSourceMap": true
     }
   ]
 }

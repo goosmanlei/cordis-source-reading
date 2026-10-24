@@ -19,7 +19,8 @@
       "smartStep": false,
       "env": {
         "TSX_DISABLE_CACHE": "1"
-      }
+      },
+      "pauseForSourceMap": true
     }
   ]
 }

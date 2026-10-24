@@ -1,0 +1,45 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2002 · 02 · 根 Context 装配与方法转发",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/lesson.mjs",
+      "cwd": "${workspaceFolder}",
+      "args": [],
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    },
+    {
+      "name": "Cordis 2002 · 03 · Fiber.effect 的登记与清理",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/lesson.mjs",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--effect"
+      ],
+      "autoAttachChildProcesses": true,
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "pauseForSourceMap": true
+    }
+  ]
+}
