@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 690" role="img" aria-labelledby="title desc">
+<title id="title">根 Context 初始化完成时的对象关系</title>
+<desc id="desc">C0 是 Context 代理，访问原始对象 T0。T0 持有根 Fiber F0 与 Reflect、Registry、Events、Logger 管理对象；它们回指 C0。此时 Registry 尚无插件 Runtime。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#506781"/></marker></defs>
+<style>text{font-family:'PingFang SC','Microsoft YaHei',sans-serif;fill:#203550} .title{font-size:23px;font-weight:600} .label{font-size:17px} .detail{font-size:16px} .line{stroke:#506781;stroke-width:2;fill:none;marker-end:url(#arrow)}</style>
+<rect width="1020" height="690" fill="#f7f9fc" rx="14"/>
+<text x="30" y="35" class="title">new Context() 返回后：入口与保存数据的对象</text>
+<rect x="25" y="278" width="210" height="105" rx="9" fill="#eaf1fa" stroke="#c5d2e1"/>
+<text x="41" y="306" class="label" font-weight="600">C0 · 返回的 root</text>
+<text x="41" y="332" class="detail">Context Proxy</text>
+<text x="41" y="354" class="detail">属性读取的入口</text>
+<rect x="305" y="278" width="230" height="105" rx="9" fill="#eaf1fa" stroke="#c5d2e1"/>
+<text x="321" y="306" class="label" font-weight="600">T0 · 原始 this</text>
+<text x="321" y="332" class="detail">Context 原对象</text>
+<text x="321" y="354" class="detail">保存 fiber 等字段</text>
+<rect x="700" y="70" width="295" height="95" rx="9" fill="#edf5f0" stroke="#c5d2e1"/>
+<text x="716" y="98" class="label" font-weight="600">F0 · 根 Fiber</text>
+<text x="716" y="124" class="detail">uid = 0</text>
+<text x="716" y="146" class="detail">runtime = null</text>
+<path class="line" d="M535 330 H600 V118 H693"/>
+<text x="615" y="110" class="detail">fiber</text>
+<rect x="700" y="180" width="295" height="95" rx="9" fill="#edf5f0" stroke="#c5d2e1"/>
+<text x="716" y="208" class="label" font-weight="600">RF · ReflectService</text>
+<text x="716" y="234" class="detail">props：入口访问规则</text>
+<text x="716" y="256" class="detail">store：服务实现记录</text>
+<path class="line" d="M535 330 H600 V228 H693"/>
+<text x="615" y="220" class="detail">reflect</text>
+<rect x="700" y="290" width="295" height="95" rx="9" fill="#edf5f0" stroke="#c5d2e1"/>
+<text x="716" y="318" class="label" font-weight="600">RG · RegistryService</text>
+<text x="716" y="344" class="detail">_internal：插件登记 Map</text>
+<text x="716" y="366" class="detail">初始 size = 0</text>
+<path class="line" d="M535 330 H600 V338 H693"/>
+<text x="615" y="330" class="detail">registry</text>
+<rect x="700" y="400" width="295" height="95" rx="9" fill="#edf5f0" stroke="#c5d2e1"/>
+<text x="716" y="428" class="label" font-weight="600">EV · EventsService</text>
+<text x="716" y="454" class="detail">_hooks：事件 → 监听记录</text>
+<text x="716" y="476" class="detail">已安装内部监听</text>
+<path class="line" d="M535 330 H600 V448 H693"/>
+<text x="615" y="440" class="detail">events</text>
+<rect x="700" y="510" width="295" height="95" rx="9" fill="#edf5f0" stroke="#c5d2e1"/>
+<text x="716" y="538" class="label" font-weight="600">LG · LoggerService</text>
+<text x="716" y="564" class="detail">buffer：消息；exporters：输出器</text>
+<text x="716" y="586" class="detail">已安装缓冲输出器</text>
+<path class="line" d="M535 330 H600 V558 H693"/>
+<text x="615" y="550" class="detail">logger</text>
+<path class="line" d="M235 330 H298"/><text x="241" y="319" class="detail">代理</text>
+<path class="line" d="M410 275 V245 H130 V271"/><text x="238" y="235" class="label">T0.root → C0</text>
+<text x="30" y="647" class="detail">回指：F0.ctx = F0.parent = C0；四个管理对象保存的 ctx 也指向 C0。</text>
+<text x="30" y="674" class="detail">箭头表示代理／字段引用；访问管理对象时，Reflect 还可产生带当前 ctx 的代理视图。</text></svg>

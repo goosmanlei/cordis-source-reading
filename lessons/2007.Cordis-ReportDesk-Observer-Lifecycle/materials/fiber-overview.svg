@@ -1,0 +1,925 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="9088" viewBox="0 0 1640 9088" role="img" aria-labelledby="title description">
+<title id="title">Fiber 的挂载、执行、释放流程与数据结构</title>
+<desc id="description">先展示带具体语句连接点的正常生命周期流程，再展示接口、字段、清理闭包的持有关系及依赖表。标识符按源码拼写，不含课程章节编号。</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#416781"/></marker>
+<marker id="async-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#a66712"/></marker>
+<style>
+text { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; fill:#172e40; }
+.title { font-size:30px; font-weight:700; } .section { font-size:25px; font-weight:700; }
+.panel-title { font-size:21px; font-weight:650; }
+.code { font-size:20px; } .note { font-size:18px; fill:#39576b; }
+.source { font-size:16px; fill:#5b6e7c; } .edge-label { font-size:14px; fill:#31536c; }
+.flow { fill:none; stroke:#416781; stroke-width:2; marker-end:url(#arrow); }
+.async-flow { fill:none; stroke:#a66712; stroke-width:2; stroke-dasharray:8 5; marker-end:url(#async-arrow); }
+.holds { fill:none; stroke:#778692; stroke-width:2; stroke-dasharray:4 5; marker-end:url(#arrow); }
+</style></defs><rect width="1640" height="9088" fill="#f8fafc"/>
+<text x="28" y="44" class="title">Fiber：从插件调用到资源释放</text>
+<text x="28" y="77" class="note">固定源码：Cordis c261dd2c13d6。以 app.plugin(notificationPlugin) 的正常挂载与 ctx.on 监听为例。</text>
+<text x="28" y="106" class="note">框内按竖线顺序阅读；跨框连线指向具体语句。蓝线表示调用或返回，橙色虚线表示微任务恢复。</text>
+<text x="28" y="153" class="section">A · 挂载与执行流程</text>
+<text x="28" y="182" class="note">同名 runner、wrapper、disposables 属于各次 effect 调用；每个框直接注明 this 的归属。</text>
+<g id="registry"><rect x="28" y="207" width="744" height="682" rx="10" fill="#edf3ff" stroke="#b9cbd9"/>
+<text x="46" y="241" class="panel-title">RegistryService.plugin · this.ctx 是调用方 app</text>
+<g id="resolve" data-box="true">
+<rect x="40" y="271" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="301" class="code">const callback = this.resolve(plugin)</text>
+<text x="71" y="327" class="note">本例解析到 notificationPlugin。</text>
+<text x="71" y="360" class="source">registry.ts 193–197</text>
+<circle cx="48" cy="296" r="4" fill="#607a8e"/>
+</g>
+<g id="runtime" data-box="true">
+<rect x="40" y="383" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="413" class="code">let runtime = this._internal.get(callback)</text>
+<text x="71" y="439" class="note">不存在时，在 203–204 行创建并登记 runtime。</text>
+<text x="71" y="472" class="source">registry.ts 199–205</text>
+<circle cx="48" cy="408" r="4" fill="#607a8e"/>
+</g>
+<g id="runtime_create" data-box="true">
+<rect x="40" y="495" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="525" class="code">runtime = { name, callback,</text>
+<text x="71" y="551" class="code">    fibers: new DisposableList(), Config: plugin.Config }</text>
+<text x="71" y="577" class="note">仅未找到 runtime 时创建；name 来自插件的名称。</text>
+<text x="71" y="610" class="source">registry.ts 200–203</text>
+<circle cx="48" cy="520" r="4" fill="#607a8e"/>
+</g>
+<g id="runtime_set" data-box="true">
+<rect x="40" y="633" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="663" class="code">this._internal.set(callback, runtime)</text>
+<text x="71" y="689" class="note">新建时登记；已存在则沿用查到的 runtime。</text>
+<text x="71" y="722" class="source">registry.ts 204–205</text>
+<circle cx="48" cy="658" r="4" fill="#607a8e"/>
+</g>
+<g id="construct" data-box="true">
+<rect x="40" y="745" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="775" class="code">const fiber = new Fiber(this.ctx, config,</text>
+<text x="71" y="801" class="code">    Inject.resolve(plugin.inject), runtime, getOuterStack)</text>
+<text x="71" y="827" class="note">依赖声明先规范化，再进入构造器。</text>
+<text x="71" y="860" class="source">registry.ts 207</text>
+<circle cx="48" cy="770" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="constructor"><rect x="868" y="207" width="744" height="1016" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="886" y="241" class="panel-title">Fiber 构造器 · this 是本次新建的 fiber</text>
+<g id="uid" data-box="true">
+<rect x="880" y="271" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="301" class="code">this.uid = parent.registry.counter</text>
+<text x="911" y="327" class="note">为本次装载取得身份。</text>
+<text x="911" y="360" class="source">fiber.ts 134</text>
+<circle cx="888" cy="296" r="4" fill="#607a8e"/>
+</g>
+<g id="context" data-box="true">
+<rect x="880" y="383" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="413" class="code">this.ctx = this.context =</text>
+<text x="911" y="439" class="code">    parent.extend({ fiber: this })</text>
+<text x="911" y="465" class="note">传给插件的 ctx.fiber 因而指向本次 fiber。</text>
+<text x="911" y="498" class="source">fiber.ts 135</text>
+<circle cx="888" cy="408" r="4" fill="#607a8e"/>
+</g>
+<g id="intercept" data-box="true">
+<rect x="880" y="521" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="551" class="code">this.ctx[Context.intercept] = Object.create(...)</text>
+<text x="911" y="577" class="note">有 inject 项时派生配置表；原型为父 Context 的表。</text>
+<text x="911" y="610" class="source">fiber.ts 137–139；参数省略</text>
+<circle cx="888" cy="546" r="4" fill="#607a8e"/>
+</g>
+<g id="intercept_item" data-box="true">
+<rect x="880" y="633" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="663" class="code">this.ctx[Context.intercept][name] = config</text>
+<text x="911" y="689" class="note">逐项写入非 null / undefined 的依赖配置。</text>
+<text x="911" y="722" class="source">fiber.ts 140–143</text>
+<circle cx="888" cy="658" r="4" fill="#607a8e"/>
+</g>
+<g id="plugin_runner" data-box="true">
+<rect x="880" y="745" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="775" class="code">this._runner = { epoch, getOuterStack, execute, collect }</text>
+<text x="911" y="801" class="note">epoch 初值为 INACTIVE；execute 稍后调用插件。</text>
+<text x="911" y="825" class="note">collect 将插件返回的清理函数放入 this._disposables。</text>
+<text x="911" y="858" class="source">fiber.ts 129–131、146–163；字段概览</text>
+<circle cx="888" cy="770" r="4" fill="#607a8e"/>
+</g>
+<g id="plugin_event" data-box="true">
+<rect x="880" y="881" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="911" class="code">this.context.emit(&#x27;internal/plugin&#x27;, this)</text>
+<text x="911" y="937" class="note">这是装载记录通知，此时插件尚未就绪。</text>
+<text x="911" y="970" class="source">fiber.ts 165</text>
+<circle cx="888" cy="906" r="4" fill="#607a8e"/>
+</g>
+<g id="check_impl" data-box="true">
+<rect x="880" y="993" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1023" class="code">this._checkImpl(name)</text>
+<text x="911" y="1049" class="note">按 inject 的名称逐项检查；结果写入 this._store。</text>
+<text x="911" y="1082" class="source">fiber.ts 167–169、375–386</text>
+<circle cx="888" cy="1018" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_effect_call" data-box="true">
+<rect x="880" y="1105" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1135" class="code">parent.fiber.effect(() =&gt; { ... }, &#x27;ctx.plugin()&#x27;)</text>
+<text x="911" y="1161" class="note">调用结果稍后赋给 this.dispose；下框展开这个箭头函数。</text>
+<text x="911" y="1194" class="source">fiber.ts 171–199；回调正文在下框</text>
+<circle cx="888" cy="1130" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="parent-effect"><rect x="28" y="999" width="744" height="1502" rx="10" fill="#edf3ff" stroke="#b9cbd9"/>
+<text x="46" y="1033" class="panel-title">父 effect → _execute · 方法中的 this 是 parent.fiber</text>
+<g id="parent_assert" data-box="true">
+<rect x="40" y="1063" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1093" class="code">this.assertActive()</text>
+<text x="71" y="1119" class="note">检查父 fiber.uid !== null。</text>
+<text x="71" y="1152" class="source">fiber.ts 282、224–226</text>
+<circle cx="48" cy="1088" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_array" data-box="true">
+<rect x="40" y="1175" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1205" class="code">const disposables: Disposable[] = []</text>
+<text x="71" y="1231" class="note">本次 effect 独有的局部清理数组。</text>
+<text x="71" y="1264" class="source">fiber.ts 284</text>
+<circle cx="48" cy="1200" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_dispose" data-box="true">
+<rect x="40" y="1287" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1317" class="code">const dispose = () =&gt; { ... }</text>
+<text x="71" y="1343" class="note">定义局部释放函数：取空数组、逆序调用，必要时串接 Promise。</text>
+<text x="71" y="1376" class="source">fiber.ts 285–298；函数体省略</text>
+<circle cx="48" cy="1312" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_runner" data-box="true">
+<rect x="40" y="1399" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1429" class="code">const runner: EffectRunner&lt;boolean&gt; = { ... }</text>
+<text x="71" y="1455" class="note">execute 保存构造器传入的回调；epoch 初值为 true。</text>
+<text x="71" y="1479" class="note">collect 收集到局部 disposables，而非子 fiber 的列表。</text>
+<text x="71" y="1512" class="source">fiber.ts 300–312；字段用途</text>
+<circle cx="48" cy="1424" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_execute" data-box="true">
+<rect x="40" y="1535" width="720" height="79" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1565" class="code">task = this._execute(runner)</text>
+<text x="71" y="1600" class="source">fiber.ts 316</text>
+<circle cx="48" cy="1560" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_call" data-box="true">
+<rect x="40" y="1623" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1653" class="code">const effect = runner.execute.call(this)</text>
+<text x="71" y="1679" class="note">进入 _execute；被调用的是箭头函数，其 this 仍捕获子 fiber。</text>
+<text x="71" y="1712" class="source">fiber.ts 243</text>
+<circle cx="48" cy="1648" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_collect" data-box="true">
+<rect x="40" y="1735" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1765" class="code">runner.collect(effect)</text>
+<text x="71" y="1791" class="note">effect 是构造器回调返回的 async 清理函数。</text>
+<text x="71" y="1824" class="source">fiber.ts 244–245</text>
+<circle cx="48" cy="1760" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_collect_push" data-box="true">
+<rect x="40" y="1847" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1877" class="code">disposables.push(dispose)</text>
+<text x="71" y="1903" class="note">collect 保存这个返回函数。</text>
+<text x="71" y="1936" class="source">fiber.ts 305</text>
+<circle cx="48" cy="1872" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_collect_delete" data-box="true">
+<rect x="40" y="1959" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="1989" class="code">this._disposables.delete(dispose)</text>
+<text x="71" y="2015" class="note">移除同一函数的既有顶层登记；本例返回函数尚无登记。</text>
+<text x="71" y="2048" class="source">fiber.ts 306</text>
+<circle cx="48" cy="1984" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_wrapper" data-box="true">
+<rect x="40" y="2071" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2101" class="code">const wrapper = defineProperty(() =&gt; { ... }, ...)</text>
+<text x="71" y="2127" class="note">wrapper 捕获局部 runner、task 与 dispose。</text>
+<text x="71" y="2160" class="source">fiber.ts 326–330；函数体与元数据省略</text>
+<circle cx="48" cy="2096" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_push" data-box="true">
+<rect x="40" y="2183" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2213" class="code">this._disposables.push(wrapper)</text>
+<text x="71" y="2239" class="note">保存到父 fiber 的顶层列表，返回仅移除此登记的函数。</text>
+<text x="71" y="2272" class="source">fiber.ts 342 的内层 push</text>
+<circle cx="48" cy="2208" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_push_remove" data-box="true">
+<rect x="40" y="2295" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2325" class="code">将内层 push 返回的函数追加到 disposables</text>
+<text x="71" y="2351" class="note">对应 disposables.push(...) 的外层调用。</text>
+<text x="71" y="2384" class="source">fiber.ts 342 的外层 push</text>
+<circle cx="48" cy="2320" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_return" data-box="true">
+<rect x="40" y="2407" width="720" height="79" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2437" class="code">return wrapper</text>
+<text x="71" y="2472" class="source">fiber.ts 343</text>
+<circle cx="48" cy="2432" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="constructor-callback"><rect x="868" y="1313" width="744" height="878" rx="10" fill="#fff7e8" stroke="#b9cbd9"/>
+<text x="886" y="1347" class="panel-title">构造器箭头回调及其调用 · this 一直是子 fiber</text>
+<g id="runtime_push" data-box="true">
+<rect x="880" y="1377" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1407" class="code">const remove = runtime.fibers.push(this)</text>
+<text x="911" y="1433" class="note">记录本次 fiber；remove 仅移除这条记录。</text>
+<text x="911" y="1466" class="source">fiber.ts 172；utils.ts 13–17</text>
+<circle cx="888" cy="1402" r="4" fill="#607a8e"/>
+</g>
+<g id="refresh" data-box="true">
+<rect x="880" y="1489" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1519" class="code">this._refresh()</text>
+<text x="911" y="1545" class="note">进入子 fiber 的依赖与轮次检查。</text>
+<text x="911" y="1578" class="source">fiber.ts 174</text>
+<circle cx="888" cy="1514" r="4" fill="#607a8e"/>
+</g>
+<g id="epoch" data-box="true">
+<rect x="880" y="1601" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1631" class="code">按 this._revision 与依赖提供者的 uid 计算 epoch</text>
+<text x="911" y="1657" class="note">任一所需实现缺失则为 INACTIVE；本例无依赖，得到 &#x27;0&#x27;。</text>
+<text x="911" y="1690" class="source">fiber.ts 389–398</text>
+<circle cx="888" cy="1626" r="4" fill="#607a8e"/>
+</g>
+<g id="set_epoch" data-box="true">
+<rect x="880" y="1713" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1743" class="code">this._setEpoch(epoch)</text>
+<text x="911" y="1769" class="note">初次依赖满足且无工作在途：发起 _reload，并设为 LOADING。</text>
+<text x="911" y="1802" class="source">fiber.ts 399、402–418</text>
+<circle cx="888" cy="1738" r="4" fill="#607a8e"/>
+</g>
+<g id="copy_store" data-box="true">
+<rect x="880" y="1825" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1855" class="code">this.store = { ...this._store }</text>
+<text x="911" y="1881" class="note">进入 _reload，保存本轮可访问的实现表。</text>
+<text x="911" y="1914" class="source">fiber.ts 420–421</text>
+<circle cx="888" cy="1850" r="4" fill="#607a8e"/>
+</g>
+<g id="pause" data-box="true">
+<rect x="880" y="1937" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="1967" class="code">await Promise.resolve()</text>
+<text x="911" y="1993" class="note">_reload 在此暂停；_setEpoch 与 _refresh 的同步调用返回。</text>
+<text x="911" y="2017" class="note">橙色虚线表示稍后恢复 _reload。</text>
+<text x="911" y="2050" class="source">fiber.ts 424</text>
+<circle cx="888" cy="1962" r="4" fill="#607a8e"/>
+</g>
+<g id="return_cleanup" data-box="true">
+<rect x="880" y="2073" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="2103" class="code">return async () =&gt; { this.uid = null; ... }</text>
+<text x="911" y="2129" class="note">返回释放整个子 fiber 的函数；不是 runtime.callback 的返回值。</text>
+<text x="911" y="2162" class="source">fiber.ts 179–198；其余函数体在释放流程中展开</text>
+<circle cx="888" cy="2098" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="return-handle"><rect x="28" y="2596" width="744" height="518" rx="10" fill="#edf3ff" stroke="#b9cbd9"/>
+<text x="46" y="2630" class="panel-title">同步部分完成 · 保存 dispose，再返回装载句柄</text>
+<g id="save_dispose" data-box="true">
+<rect x="40" y="2660" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2690" class="code">this.dispose 保存父 effect 返回的 wrapper</text>
+<text x="71" y="2716" class="note">这里的 this 是构造器中的子 fiber。</text>
+<text x="71" y="2749" class="source">fiber.ts 171–199</text>
+<circle cx="48" cy="2685" r="4" fill="#607a8e"/>
+</g>
+<g id="wrapped" data-box="true">
+<rect x="40" y="2772" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2802" class="code">const wrapped = Object.create(fiber)</text>
+<text x="71" y="2828" class="note">恢复到 RegistryService.plugin。</text>
+<text x="71" y="2861" class="source">registry.ts 208</text>
+<circle cx="48" cy="2797" r="4" fill="#607a8e"/>
+</g>
+<g id="then" data-box="true">
+<rect x="40" y="2884" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="2914" class="code">wrapped.then = (...) =&gt; fiber.await().then(...)</text>
+<text x="71" y="2940" class="note">增加等待当前生命周期工作的入口。</text>
+<text x="71" y="2973" class="source">registry.ts 209–211；参数省略</text>
+<circle cx="48" cy="2909" r="4" fill="#607a8e"/>
+</g>
+<g id="return_handle" data-box="true">
+<rect x="40" y="2996" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="3026" class="code">return wrapped</text>
+<text x="71" y="3052" class="note">本例调用方把这个句柄保存为 notification。</text>
+<text x="71" y="3085" class="source">registry.ts 212；examples/01-reportdesk/start.ts</text>
+<circle cx="48" cy="3021" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="load-resume"><rect x="868" y="3209" width="744" height="630" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="886" y="3243" class="panel-title">_reload 恢复 → 子 _runner.execute · this 是子 fiber</text>
+<g id="resume" data-box="true">
+<rect x="880" y="3273" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="3303" class="code">确认 this._runner.epoch === oldEpoch</text>
+<text x="911" y="3329" class="note">目标未改变才继续执行本轮插件。</text>
+<text x="911" y="3362" class="source">fiber.ts 425</text>
+<circle cx="888" cy="3298" r="4" fill="#607a8e"/>
+</g>
+<g id="child_execute" data-box="true">
+<rect x="880" y="3385" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="3415" class="code">await this._execute(this._runner)</text>
+<text x="911" y="3441" class="note">此时 _execute 的 runner 参数对应子 fiber 的 _runner。</text>
+<text x="911" y="3474" class="source">fiber.ts 426</text>
+<circle cx="888" cy="3410" r="4" fill="#607a8e"/>
+</g>
+<g id="child_call" data-box="true">
+<rect x="880" y="3497" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="3527" class="code">const effect = runner.execute.call(this)</text>
+<text x="911" y="3553" class="note">这次 execute 是构造器 149 行定义的普通 function。</text>
+<text x="911" y="3586" class="source">fiber.ts 243、149</text>
+<circle cx="888" cy="3522" r="4" fill="#607a8e"/>
+</g>
+<g id="config" data-box="true">
+<rect x="880" y="3609" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="3639" class="code">const config = this._resolve(this.config)</text>
+<text x="911" y="3665" class="note">经过 internal/config 处理插件配置。</text>
+<text x="911" y="3698" class="source">fiber.ts 150、229–230；events.ts 71–73</text>
+<circle cx="888" cy="3634" r="4" fill="#607a8e"/>
+</g>
+<g id="callback" data-box="true">
+<rect x="880" y="3721" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="3751" class="code">return runtime.callback(this.ctx, config)</text>
+<text x="911" y="3777" class="note">进入实际的 notificationPlugin。</text>
+<text x="911" y="3810" class="source">fiber.ts 159</text>
+<circle cx="888" cy="3746" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="event-effect"><rect x="28" y="3359" width="744" height="854" rx="10" fill="#eef4ff" stroke="#b9cbd9"/>
+<text x="46" y="3393" class="panel-title">notificationPlugin → EventsService → 子 fiber.effect</text>
+<g id="on" data-box="true">
+<rect x="40" y="3423" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="3453" class="code">ctx.on(&quot;report/completed&quot;, (...) =&gt; { ... })</text>
+<text x="71" y="3479" class="note">插件收到的是子 fiber 的 ctx；参数与函数体省略。</text>
+<text x="71" y="3512" class="source">app/notification-plugin.ts 5–8</text>
+<circle cx="48" cy="3448" r="4" fill="#607a8e"/>
+</g>
+<g id="register_effect" data-box="true">
+<rect x="40" y="3535" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="3565" class="code">return this.ctx.fiber.effect(() =&gt; { ... }, label)</text>
+<text x="71" y="3591" class="note">进入 register；此处 this 是事件服务的调用视图。</text>
+<text x="71" y="3624" class="source">events.ts 138–145；回调正文在下面两行</text>
+<circle cx="48" cy="3560" r="4" fill="#607a8e"/>
+</g>
+<g id="append_hook" data-box="true">
+<rect x="40" y="3647" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="3677" class="code">hooks[method]({ ctx: this.ctx, callback, ...options })</text>
+<text x="71" y="3703" class="note">子 effect 立即执行 register 的箭头函数，向共享表登记监听。</text>
+<text x="71" y="3736" class="source">events.ts 141–142</text>
+<circle cx="48" cy="3672" r="4" fill="#607a8e"/>
+</g>
+<g id="return_unregister" data-box="true">
+<rect x="40" y="3759" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="3789" class="code">return () =&gt; this.unregister(name, callback)</text>
+<text x="71" y="3815" class="note">这一次 execute 的返回值是单条监听的清理函数。</text>
+<text x="71" y="3848" class="source">events.ts 143</text>
+<circle cx="48" cy="3784" r="4" fill="#607a8e"/>
+</g>
+<g id="event_collect" data-box="true">
+<rect x="40" y="3871" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="3901" class="code">runner.collect(effect)</text>
+<text x="71" y="3927" class="note">子 effect 的局部 disposables 收集 unregister 闭包。</text>
+<text x="71" y="3960" class="source">fiber.ts 245、304–309</text>
+<circle cx="48" cy="3896" r="4" fill="#607a8e"/>
+</g>
+<g id="event_wrapper" data-box="true">
+<rect x="40" y="3983" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="4013" class="code">将本次 wrapper 登记到子 fiber 的 _disposables</text>
+<text x="71" y="4039" class="note">同样执行两层 push；局部数组还保存移除 wrapper 登记的函数。</text>
+<text x="71" y="4072" class="source">fiber.ts 326–343；结构见后方资源持有图</text>
+<circle cx="48" cy="4008" r="4" fill="#607a8e"/>
+</g>
+<g id="plugin_return" data-box="true">
+<rect x="40" y="4095" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="4125" class="code">notificationPlugin 返回 undefined</text>
+<text x="71" y="4151" class="note">插件没有直接返回清理函数；ctx.on 已登记自己的资源。</text>
+<text x="71" y="4184" class="source">app/notification-plugin.ts 5–9</text>
+<circle cx="48" cy="4120" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="load-finish"><rect x="868" y="4278" width="744" height="494" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="886" y="4312" class="panel-title">_reload 正常收束 · 目标 epoch 仍未改变</text>
+<g id="no_plugin_cleanup" data-box="true">
+<rect x="880" y="4342" width="720" height="79" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="4372" class="code">_execute 接受 undefined，不再收集额外清理函数</text>
+<text x="911" y="4407" class="source">fiber.ts 246–247</text>
+<circle cx="888" cy="4367" r="4" fill="#607a8e"/>
+</g>
+<g id="inertia_done" data-box="true">
+<rect x="880" y="4430" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="4460" class="code">this.inertia = undefined</text>
+<text x="911" y="4486" class="note">当前加载结束；_updateState 的回调未指定过渡状态。</text>
+<text x="911" y="4519" class="source">fiber.ts 437–440</text>
+<circle cx="888" cy="4455" r="4" fill="#607a8e"/>
+</g>
+<g id="active" data-box="true">
+<rect x="880" y="4542" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="4572" class="code">this.state = callback() ?? this._getState()</text>
+<text x="911" y="4598" class="note">uid 有效、无 _error、epoch 有效，本例得到 ACTIVE。</text>
+<text x="911" y="4631" class="source">fiber.ts 352–361</text>
+<circle cx="888" cy="4567" r="4" fill="#607a8e"/>
+</g>
+<g id="status" data-box="true">
+<rect x="880" y="4654" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="4684" class="code">this.context.emit(&#x27;internal/status&#x27;, this, oldState)</text>
+<text x="911" y="4710" class="note">这是状态变化通知；与构造阶段的 internal/plugin 区分。</text>
+<text x="911" y="4743" class="source">fiber.ts 364</text>
+<circle cx="888" cy="4679" r="4" fill="#607a8e"/>
+</g>
+</g>
+<text x="28" y="4867" class="section">B · 释放流程</text>
+<text x="28" y="4896" class="note">本例由 notification.dispose() 开始；父 fiber._unload() 也会调用父列表中的同一个 wrapper。</text>
+<g id="release-parent"><rect x="28" y="4921" width="744" height="742" rx="10" fill="#edf3ff" stroke="#b9cbd9"/>
+<text x="46" y="4955" class="panel-title">父 effect 的 wrapper → 局部 dispose</text>
+<g id="dispose_call" data-box="true">
+<rect x="40" y="4985" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5015" class="code">调用 notification.dispose()</text>
+<text x="71" y="5041" class="note">取到构造器保存的父 effect 的 wrapper。</text>
+<text x="71" y="5074" class="source">fiber.ts 171–199、326–330</text>
+<circle cx="48" cy="5010" r="4" fill="#607a8e"/>
+</g>
+<g id="close_parent" data-box="true">
+<rect x="40" y="5097" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5127" class="code">runner.epoch = false</text>
+<text x="71" y="5153" class="note">wrapper 先检查 epoch；关闭后重复调用不再启动清理。</text>
+<text x="71" y="5186" class="source">fiber.ts 327–328</text>
+<circle cx="48" cy="5122" r="4" fill="#607a8e"/>
+</g>
+<g id="local_dispose" data-box="true">
+<rect x="40" y="5209" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5239" class="code">调用局部 dispose()</text>
+<text x="71" y="5265" class="note">若初始化 task 存在，则在其正常完成后调用。</text>
+<text x="71" y="5298" class="source">fiber.ts 329</text>
+<circle cx="48" cy="5234" r="4" fill="#607a8e"/>
+</g>
+<g id="reverse_parent" data-box="true">
+<rect x="40" y="5321" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5351" class="code">disposables.splice(0).reverse()</text>
+<text x="71" y="5377" class="note">取空本次局部数组，按后进先出顺序处理。</text>
+<text x="71" y="5410" class="source">fiber.ts 287</text>
+<circle cx="48" cy="5346" r="4" fill="#607a8e"/>
+</g>
+<g id="remove_parent_entry" data-box="true">
+<rect x="40" y="5433" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5463" class="code">先移除父 _disposables 中的 wrapper 登记</text>
+<text x="71" y="5489" class="note">这是内层 push 返回的函数；它本身不调用 wrapper。</text>
+<text x="71" y="5522" class="source">fiber.ts 342；utils.ts 17</text>
+<circle cx="48" cy="5458" r="4" fill="#607a8e"/>
+</g>
+<g id="call_child_cleanup" data-box="true">
+<rect x="40" y="5545" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5575" class="code">调用构造器返回的 async 清理函数</text>
+<text x="71" y="5601" class="note">下一框是这一函数的实际主体。</text>
+<text x="71" y="5634" class="source">fiber.ts 179–198</text>
+<circle cx="48" cy="5570" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="release-child"><rect x="868" y="4921" width="744" height="742" rx="10" fill="#fff7e8" stroke="#b9cbd9"/>
+<text x="886" y="4955" class="panel-title">构造器的 async 清理函数 · this 是子 fiber</text>
+<g id="null_uid" data-box="true">
+<rect x="880" y="4985" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="5015" class="code">this.uid = null</text>
+<text x="911" y="5041" class="note">这次装载身份失效，不能继续登记新 effect。</text>
+<text x="911" y="5074" class="source">fiber.ts 180、224–226</text>
+<circle cx="888" cy="5010" r="4" fill="#607a8e"/>
+</g>
+<g id="dispose_event" data-box="true">
+<rect x="880" y="5097" width="720" height="79" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="5127" class="code">this.context.emit(&#x27;internal/plugin&#x27;, this)</text>
+<text x="911" y="5162" class="source">fiber.ts 181</text>
+<circle cx="888" cy="5122" r="4" fill="#607a8e"/>
+</g>
+<g id="remove_runtime" data-box="true">
+<rect x="880" y="5185" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="5215" class="code">remove()</text>
+<text x="911" y="5241" class="note">registry 仍有该 callback 时，从 runtime.fibers 移除本实例。</text>
+<text x="911" y="5274" class="source">fiber.ts 182–183</text>
+<circle cx="888" cy="5210" r="4" fill="#607a8e"/>
+</g>
+<g id="delete_runtime" data-box="true">
+<rect x="880" y="5297" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="5327" class="code">this.ctx.registry.delete(runtime.callback)</text>
+<text x="911" y="5353" class="note">仅在 runtime.fibers 已为空时删除整个运行记录。</text>
+<text x="911" y="5386" class="source">fiber.ts 184–186</text>
+<circle cx="888" cy="5322" r="4" fill="#607a8e"/>
+</g>
+<g id="inactive" data-box="true">
+<rect x="880" y="5409" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="5439" class="code">this._setEpoch(INACTIVE)</text>
+<text x="911" y="5465" class="note">本例已 ACTIVE，发起 _unload，进入 UNLOADING。</text>
+<text x="911" y="5498" class="source">fiber.ts 188、402–418</text>
+<circle cx="888" cy="5434" r="4" fill="#607a8e"/>
+</g>
+<g id="wait_inertia" data-box="true">
+<rect x="880" y="5521" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="5551" class="code">while (this.inertia) await this.inertia</text>
+<text x="911" y="5577" class="note">_unload 已发起；等待其 Promise，当前 async 函数在此暂停。</text>
+<text x="911" y="5601" class="note">循环会继续等待阶段交接，直到没有当前装载／卸载工作。</text>
+<text x="911" y="5634" class="source">fiber.ts 195–197</text>
+<circle cx="888" cy="5546" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="unload"><rect x="28" y="5728" width="744" height="966" rx="10" fill="#eef4ff" stroke="#b9cbd9"/>
+<text x="46" y="5762" class="panel-title">子 fiber._unload → 资源 effect 的 wrapper</text>
+<g id="clear" data-box="true">
+<rect x="40" y="5792" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5822" class="code">this._disposables.clear()</text>
+<text x="71" y="5848" class="note">取出并反转资源入口，清空登记；这里尚未调用它们。</text>
+<text x="71" y="5881" class="source">fiber.ts 448；utils.ts 26–29</text>
+<circle cx="48" cy="5817" r="4" fill="#607a8e"/>
+</g>
+<g id="resource_callbacks" data-box="true">
+<rect x="40" y="5904" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="5934" class="code">为取出的每个 dispose 启动 async 回调</text>
+<text x="71" y="5960" class="note">map 的结果交给 Promise.all；各项清理可以并发。</text>
+<text x="71" y="5993" class="source">fiber.ts 448–458</text>
+<circle cx="48" cy="5929" r="4" fill="#607a8e"/>
+</g>
+<g id="resource_pause" data-box="true">
+<rect x="40" y="6016" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6046" class="code">await Promise.resolve()</text>
+<text x="71" y="6072" class="note">资源回调在此让出；构造器的 async 清理函数进入等待循环。</text>
+<text x="71" y="6105" class="source">fiber.ts 451、195–197</text>
+<circle cx="48" cy="6041" r="4" fill="#607a8e"/>
+</g>
+<g id="call_resources" data-box="true">
+<rect x="40" y="6128" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6158" class="code">await dispose()</text>
+<text x="71" y="6184" class="note">微任务恢复后调用本项清理入口。</text>
+<text x="71" y="6217" class="source">fiber.ts 453</text>
+<circle cx="48" cy="6153" r="4" fill="#607a8e"/>
+</g>
+<g id="listener_wrapper" data-box="true">
+<rect x="40" y="6240" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6270" class="code">调用监听 effect 的 wrapper</text>
+<text x="71" y="6296" class="note">关闭自己的 runner.epoch，并逆序清理局部 disposables。</text>
+<text x="71" y="6329" class="source">fiber.ts 326–330、285–298</text>
+<circle cx="48" cy="6265" r="4" fill="#607a8e"/>
+</g>
+<g id="remove_listener_entry" data-box="true">
+<rect x="40" y="6352" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6382" class="code">移除监听 wrapper 的登记</text>
+<text x="71" y="6408" class="note">如果 _unload 已清空列表，此次移除不再改变列表。</text>
+<text x="71" y="6441" class="source">fiber.ts 342；utils.ts 17</text>
+<circle cx="48" cy="6377" r="4" fill="#607a8e"/>
+</g>
+<g id="unregister" data-box="true">
+<rect x="40" y="6464" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6494" class="code">this.unregister(name, callback)</text>
+<text x="71" y="6520" class="note">执行收集的闭包；this 回到事件服务的词法环境。</text>
+<text x="71" y="6553" class="source">events.ts 143、147–156</text>
+<circle cx="48" cy="6489" r="4" fill="#607a8e"/>
+</g>
+<g id="remove_hook" data-box="true">
+<rect x="40" y="6576" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6606" class="code">hooks.splice(index, 1)</text>
+<text x="71" y="6632" class="note">按 callback 引用移除监听；空桶还会被删除。</text>
+<text x="71" y="6665" class="source">events.ts 150–153</text>
+<circle cx="48" cy="6601" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="unload-finish"><rect x="868" y="5938" width="744" height="654" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="886" y="5972" class="panel-title">_unload 收束与外层等待</text>
+<g id="unload_wait" data-box="true">
+<rect x="880" y="6002" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="6032" class="code">await Promise.all(...) 完成</text>
+<text x="911" y="6058" class="note">所有已取出的资源入口完成本轮清理。</text>
+<text x="911" y="6091" class="source">fiber.ts 448–458；各项工作错误按源码记录</text>
+<circle cx="888" cy="6027" r="4" fill="#607a8e"/>
+</g>
+<g id="store_clear" data-box="true">
+<rect x="880" y="6114" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="6144" class="code">this.store = undefined</text>
+<text x="911" y="6170" class="note">清空本轮实现表。</text>
+<text x="911" y="6203" class="source">fiber.ts 459</text>
+<circle cx="888" cy="6139" r="4" fill="#607a8e"/>
+</g>
+<g id="end_inertia" data-box="true">
+<rect x="880" y="6226" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="6256" class="code">this.inertia = undefined</text>
+<text x="911" y="6282" class="note">本例目标为 INACTIVE，不再接续 _reload。</text>
+<text x="911" y="6315" class="source">fiber.ts 460–462</text>
+<circle cx="888" cy="6251" r="4" fill="#607a8e"/>
+</g>
+<g id="disposed" data-box="true">
+<rect x="880" y="6338" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="6368" class="code">this._getState() 根据 uid === null 得到 DISPOSED</text>
+<text x="911" y="6394" class="note">经 _updateState 更新状态，_unload 随后结束。</text>
+<text x="911" y="6427" class="source">fiber.ts 352–364、460–468</text>
+<circle cx="888" cy="6363" r="4" fill="#607a8e"/>
+</g>
+<g id="dispose_resolved" data-box="true">
+<rect x="880" y="6450" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="6480" class="code">while (this.inertia) 循环退出</text>
+<text x="911" y="6506" class="note">await this.inertia 恢复后读到 undefined，子装载清理函数返回。</text>
+<text x="911" y="6530" class="note">父 effect 的局部 dispose 完成；notification.dispose() 随之完成。</text>
+<text x="911" y="6563" class="source">fiber.ts 195–198、285–298、329</text>
+<circle cx="888" cy="6475" r="4" fill="#607a8e"/>
+</g>
+</g>
+<text x="28" y="6794" class="section">C · Fiber 的接口、字段与外部关联</text>
+<text x="28" y="6823" class="note">上面同一条流程使用这些字段；下划线字段和局部变量按实际定义区分。</text>
+<g id="class-identity"><rect x="28" y="6848" width="744" height="574" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="46" y="6882" class="panel-title">本次 Fiber 的身份、上下文与插件记录</text>
+<g id="field_identity" data-box="true">
+<rect x="40" y="6912" width="720" height="105" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="6942" class="code">uid / parent / ctx / context</text>
+<text x="71" y="6968" class="code">ctx 与 context 指向同一个派生 Context。</text>
+<text x="71" y="7003" class="source">fiber.ts 104–127、134–135</text>
+<circle cx="48" cy="6937" r="4" fill="#607a8e"/>
+</g>
+<g id="field_runtime" data-box="true">
+<rect x="40" y="7026" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="7056" class="code">runtime（类型 Plugin.Runtime）</text>
+<text x="71" y="7082" class="code">name / callback / fibers / Config</text>
+<text x="71" y="7108" class="note">RegistryService 按 callback 保存；fibers 是同一 callback 的 Fiber 集合。</text>
+<text x="71" y="7141" class="source">registry.ts 94–99、199–207</text>
+<circle cx="48" cy="7051" r="4" fill="#607a8e"/>
+</g>
+<g id="field_config" data-box="true">
+<rect x="40" y="7164" width="720" height="105" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="7194" class="code">config：本次插件配置</text>
+<text x="71" y="7220" class="code">inject：规范化的依赖名称与服务配置</text>
+<text x="71" y="7255" class="source">fiber.ts 124–125；registry.ts 43–59</text>
+<circle cx="48" cy="7189" r="4" fill="#607a8e"/>
+</g>
+<g id="field_api" data-box="true">
+<rect x="40" y="7278" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="7308" class="code">effect / dispose / await / restart / update</text>
+<text x="71" y="7334" class="code">assertActive / getEffects / name</text>
+<text x="71" y="7360" class="note">dispose 是构造器保存的函数；name 是访问器。</text>
+<text x="71" y="7393" class="source">fiber.ts 107、171–226、279–350、470–505</text>
+<circle cx="48" cy="7303" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="class-work"><rect x="868" y="6848" width="744" height="600" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="886" y="6882" class="panel-title">本次 Fiber 的运行与资源字段</text>
+<g id="field_runner" data-box="true">
+<rect x="880" y="6912" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="6942" class="code">_runner：EffectRunner&lt;string&gt;</text>
+<text x="911" y="6968" class="code">epoch / execute / collect / getOuterStack</text>
+<text x="911" y="6994" class="note">execute 调用插件；collect 存到本 Fiber 的 _disposables。</text>
+<text x="911" y="7027" class="source">fiber.ts 71–76、119、146–163</text>
+<circle cx="888" cy="6937" r="4" fill="#607a8e"/>
+</g>
+<g id="field_state" data-box="true">
+<rect x="880" y="7050" width="720" height="131" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="7080" class="code">_revision：主动 restart 的轮次计数</text>
+<text x="911" y="7106" class="code">_error：失败记录；state：当前报告的阶段</text>
+<text x="911" y="7132" class="code">inertia：当前 _reload / _unload 的 Promise</text>
+<text x="911" y="7167" class="source">fiber.ts 106–120、352–373、402–505</text>
+<circle cx="888" cy="7075" r="4" fill="#607a8e"/>
+</g>
+<g id="field_lists" data-box="true">
+<rect x="880" y="7190" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="7220" class="code">_disposables：DisposableList&lt;Disposable&gt;</text>
+<text x="911" y="7246" class="code">_hooks：本 Fiber 的局部更新处理器表</text>
+<text x="911" y="7272" class="note">共享业务事件表是 EventsService._hooks，归属不同。</text>
+<text x="911" y="7305" class="source">fiber.ts 111–112；events.ts 46、54–69</text>
+<circle cx="888" cy="7215" r="4" fill="#607a8e"/>
+</g>
+<g id="field_stores" data-box="true">
+<rect x="880" y="7328" width="720" height="105" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="7358" class="code">_store：当前检查得到的依赖实现</text>
+<text x="911" y="7384" class="code">store：本轮运行使用的实现表</text>
+<text x="911" y="7419" class="source">fiber.ts 108、120、375–426、459</text>
+<circle cx="888" cy="7353" r="4" fill="#607a8e"/>
+</g>
+</g>
+<text x="28" y="7538" class="section">D · 挂载完成时的资源持有结构</text>
+<text x="28" y="7567" class="note">灰色虚线表示保存引用；同名 wrapper 与 disposables 由框标题区分作用域。</text>
+<g id="owner-parent"><rect x="28" y="7592" width="744" height="430" rx="10" fill="#edf3ff" stroke="#b9cbd9"/>
+<text x="46" y="7626" class="panel-title">父 fiber 管整次子装载</text>
+<g id="parent_top" data-box="true">
+<rect x="40" y="7656" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="7686" class="code">parent.fiber._disposables</text>
+<text x="71" y="7712" class="note">保存父 effect 的 wrapper；该函数也是子 fiber.dispose。</text>
+<text x="71" y="7745" class="source">fiber.ts 171–199、342–343</text>
+<circle cx="48" cy="7681" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_closure" data-box="true">
+<rect x="40" y="7768" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="7798" class="code">父 effect 的 wrapper 闭包</text>
+<text x="71" y="7824" class="note">捕获局部 runner、task、dispose；dispose 捕获局部 disposables。</text>
+<text x="71" y="7857" class="source">fiber.ts 284–343</text>
+<circle cx="48" cy="7793" r="4" fill="#607a8e"/>
+</g>
+<g id="parent_contents" data-box="true">
+<rect x="40" y="7880" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="7910" class="code">父 effect 的局部 disposables</text>
+<text x="71" y="7936" class="note">先存：构造器返回的 async 清理函数。</text>
+<text x="71" y="7960" class="note">后存：移除父 wrapper 登记的函数。</text>
+<text x="71" y="7993" class="source">fiber.ts 179–198、305、342</text>
+<circle cx="48" cy="7905" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="owner-child"><rect x="868" y="7592" width="744" height="430" rx="10" fill="#eaf6f2" stroke="#b9cbd9"/>
+<text x="886" y="7626" class="panel-title">子 fiber 管自己登记的监听</text>
+<g id="child_top" data-box="true">
+<rect x="880" y="7656" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="7686" class="code">this._disposables（子 fiber）</text>
+<text x="911" y="7712" class="note">保存监听 effect 的 wrapper。</text>
+<text x="911" y="7745" class="source">events.ts 140–144；fiber.ts 342–343</text>
+<circle cx="888" cy="7681" r="4" fill="#607a8e"/>
+</g>
+<g id="child_closure" data-box="true">
+<rect x="880" y="7768" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="7798" class="code">监听 effect 的 wrapper 闭包</text>
+<text x="911" y="7824" class="note">捕获另一组局部 runner、task、dispose、disposables。</text>
+<text x="911" y="7857" class="source">fiber.ts 281–343</text>
+<circle cx="888" cy="7793" r="4" fill="#607a8e"/>
+</g>
+<g id="child_contents" data-box="true">
+<rect x="880" y="7880" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="7910" class="code">监听 effect 的局部 disposables</text>
+<text x="911" y="7936" class="note">先存：() =&gt; this.unregister(name, callback)。</text>
+<text x="911" y="7960" class="note">后存：移除监听 wrapper 登记的函数。</text>
+<text x="911" y="7993" class="source">events.ts 143；fiber.ts 305、342</text>
+<circle cx="888" cy="7905" r="4" fill="#607a8e"/>
+</g>
+</g>
+<text x="28" y="8112" class="section">E · 依赖表与运行状态的数据含义</text>
+<text x="28" y="8141" class="note">Impl 保存 name、fiber、value、check；fiber 是服务提供者，value 是服务对象。左侧按选取、复制、访问的顺序阅读。</text>
+<g id="dep-stores"><rect x="28" y="8166" width="744" height="742" rx="10" fill="#eef4ff" stroke="#b9cbd9"/>
+<text x="46" y="8200" class="panel-title">实现从登记表进入本轮访问表</text>
+<g id="reflect_store" data-box="true">
+<rect x="40" y="8230" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="8260" class="code">this.ctx.reflect.store[key]</text>
+<text x="71" y="8286" class="note">key 是该服务的隔离标识；值为 Impl。</text>
+<text x="71" y="8319" class="source">reflect.ts 54–59、137、156–161</text>
+<circle cx="48" cy="8255" r="4" fill="#607a8e"/>
+</g>
+<g id="candidate_store" data-box="true">
+<rect x="40" y="8342" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="8372" class="code">fiber._store[name]</text>
+<text x="71" y="8398" class="note">_checkImpl 保存当前可用依赖；缺失或检查失败则删除。</text>
+<text x="71" y="8431" class="source">fiber.ts 375–386</text>
+<circle cx="48" cy="8367" r="4" fill="#607a8e"/>
+</g>
+<g id="running_store" data-box="true">
+<rect x="40" y="8454" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="8484" class="code">fiber.store[name]</text>
+<text x="71" y="8510" class="note">_reload 从 _store 浅复制；provide 可加入自身提供的 Impl。</text>
+<text x="71" y="8543" class="source">fiber.ts 421；reflect.ts 188–193</text>
+<circle cx="48" cy="8479" r="4" fill="#607a8e"/>
+</g>
+<g id="read_service" data-box="true">
+<rect x="40" y="8566" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="8596" class="code">ctx.report</text>
+<text x="71" y="8622" class="note">在声明 report 依赖的插件中访问；先确定定义位置与 fiber。</text>
+<text x="71" y="8655" class="source">reflect.ts 79–85；此为依赖插件的访问例</text>
+<circle cx="48" cy="8591" r="4" fill="#607a8e"/>
+</g>
+<g id="read_impl" data-box="true">
+<rect x="40" y="8678" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="8708" class="code">const impl = fiber.store?.[prop]</text>
+<text x="71" y="8734" class="note">prop 在此例为 &#x27;report&#x27;；从本轮表中取实现记录。</text>
+<text x="71" y="8767" class="source">reflect.ts 86</text>
+<circle cx="48" cy="8703" r="4" fill="#607a8e"/>
+</g>
+<g id="read_value" data-box="true">
+<rect x="40" y="8790" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="71" y="8820" class="code">return getTraceable(ctx, impl.value)</text>
+<text x="71" y="8846" class="note">找到实现后，返回保留调用 Context 的服务视图。</text>
+<text x="71" y="8879" class="source">reflect.ts 87</text>
+<circle cx="48" cy="8815" r="4" fill="#607a8e"/>
+</g>
+</g>
+<g id="state-data"><rect x="868" y="8166" width="744" height="864" rx="10" fill="#fff7e8" stroke="#b9cbd9"/>
+<text x="886" y="8200" class="panel-title">目标轮次、当前工作与报告状态</text>
+<g id="epoch_data" data-box="true">
+<rect x="880" y="8230" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="8260" class="code">_runner.epoch</text>
+<text x="911" y="8286" class="note">INACTIVE：期望停用。</text>
+<text x="911" y="8310" class="note">其他字符串：_revision 与所需实现的 impl.fiber.uid 组合。</text>
+<text x="911" y="8343" class="source">fiber.ts 101、389–407</text>
+<circle cx="888" cy="8255" r="4" fill="#607a8e"/>
+</g>
+<g id="inertia_data" data-box="true">
+<rect x="880" y="8366" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="8396" class="code">inertia</text>
+<text x="911" y="8422" class="note">存在：正在完成加载或卸载，新的目标先只更新 epoch。</text>
+<text x="911" y="8446" class="note">不存在：当前没有这类工作；await() 不等待未来依赖出现。</text>
+<text x="911" y="8479" class="source">fiber.ts 408、420–475</text>
+<circle cx="888" cy="8391" r="4" fill="#607a8e"/>
+</g>
+<g id="state_data" data-box="true">
+<rect x="880" y="8502" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="8532" class="code">state</text>
+<text x="911" y="8558" class="note">PENDING / LOADING / ACTIVE / UNLOADING / FAILED / DISPOSED</text>
+<text x="911" y="8582" class="note">assertActive 实际检查 uid，不能只凭状态名称判断可否登记资源。</text>
+<text x="911" y="8615" class="source">fiber.ts 78–85、224–226、352–373</text>
+<circle cx="888" cy="8527" r="4" fill="#607a8e"/>
+</g>
+<g id="updates_data" data-box="true">
+<rect x="880" y="8638" width="720" height="129" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="8668" class="code">restart：递增 _revision，重新计算目标。</text>
+<text x="911" y="8694" class="code">update：保存 config、清 _error，再交给更新链处理。</text>
+<text x="911" y="8720" class="note">restart 本身不清 _error；根 fiber 的 dispose 实际调用 restart。</text>
+<text x="911" y="8753" class="source">fiber.ts 200–212、478–505</text>
+<circle cx="888" cy="8663" r="4" fill="#607a8e"/>
+</g>
+<g id="inject_keys" data-box="true">
+<rect x="880" y="8776" width="720" height="103" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="8806" class="code">Object.keys(this.inject)</text>
+<text x="911" y="8832" class="note">这些名称用于 _checkImpl 选取实现，也用于 _refresh 判定依赖。</text>
+<text x="911" y="8865" class="source">fiber.ts 167–169、389–399</text>
+<circle cx="888" cy="8801" r="4" fill="#607a8e"/>
+</g>
+<g id="inject_config" data-box="true">
+<rect x="880" y="8888" width="720" height="127" rx="6" fill="#ffffff" stroke="#d5dfe7"/>
+<text x="911" y="8918" class="code">ctx[Context.intercept][name]</text>
+<text x="911" y="8944" class="note">inject 中非空的配置值写入这张表。</text>
+<text x="911" y="8968" class="note">Service 的 [symbols.resolveConfig] 按服务名读取并合并配置。</text>
+<text x="911" y="9001" class="source">fiber.ts 137–143；service.ts 51–66</text>
+<circle cx="888" cy="8913" r="4" fill="#607a8e"/>
+</g>
+</g>
+<text x="28" y="9068" class="note">流程展开函数插件与同步监听的正常分支；构造类、其他 Effect 返回类型及异常分支未逐步展开。</text>
+<path d="M 48 296 H 32 V 408 H 43" class="flow"/>
+<path d="M 48 408 H 32 V 520 H 43" class="flow"/>
+<path d="M 48 520 H 32 V 658 H 43" class="flow"/>
+<path d="M 48 658 H 32 V 770 H 43" class="flow"/>
+<path d="M 888 296 H 872 V 408 H 883" class="flow"/>
+<path d="M 888 408 H 872 V 546 H 883" class="flow"/>
+<path d="M 888 546 H 872 V 658 H 883" class="flow"/>
+<path d="M 888 658 H 872 V 770 H 883" class="flow"/>
+<path d="M 888 770 H 872 V 906 H 883" class="flow"/>
+<path d="M 888 906 H 872 V 1018 H 883" class="flow"/>
+<path d="M 888 1018 H 872 V 1130 H 883" class="flow"/>
+<path d="M 760 770 H 810 V 296 H 888" class="flow"/>
+<path d="M 48 1088 H 32 V 1200 H 43" class="flow"/>
+<path d="M 48 1200 H 32 V 1312 H 43" class="flow"/>
+<path d="M 48 1312 H 32 V 1424 H 43" class="flow"/>
+<path d="M 48 1424 H 32 V 1560 H 43" class="flow"/>
+<path d="M 48 1560 H 32 V 1648 H 43" class="flow"/>
+<path d="M 48 1760 H 32 V 1872 H 43" class="flow"/>
+<path d="M 48 1872 H 32 V 1984 H 43" class="flow"/>
+<path d="M 48 1984 H 32 V 2096 H 43" class="flow"/>
+<path d="M 48 2096 H 32 V 2208 H 43" class="flow"/>
+<path d="M 48 2208 H 32 V 2320 H 43" class="flow"/>
+<path d="M 48 2320 H 32 V 2432 H 43" class="flow"/>
+<path d="M 888 1130 H 825 V 1088 H 760" class="flow"/>
+<path d="M 888 1402 H 872 V 1514 H 883" class="flow"/>
+<path d="M 888 1514 H 872 V 1626 H 883" class="flow"/>
+<path d="M 888 1626 H 872 V 1738 H 883" class="flow"/>
+<path d="M 888 1738 H 872 V 1850 H 883" class="flow"/>
+<path d="M 888 1850 H 872 V 1962 H 883" class="flow"/>
+<path d="M 888 1962 H 872 V 2098 H 883" class="flow"/>
+<path d="M 760 1648 H 802 V 1402 H 888" class="flow"/>
+<path d="M 888 2098 H 837 V 1760 H 760" class="flow"/>
+<path d="M 48 2685 H 32 V 2797 H 43" class="flow"/>
+<path d="M 48 2797 H 32 V 2909 H 43" class="flow"/>
+<path d="M 48 2909 H 32 V 3021 H 43" class="flow"/>
+<path d="M 48 2432 H 7 V 2685 H 48" class="flow"/>
+<path d="M 888 3298 H 872 V 3410 H 883" class="flow"/>
+<path d="M 888 3410 H 872 V 3522 H 883" class="flow"/>
+<path d="M 888 3522 H 872 V 3634 H 883" class="flow"/>
+<path d="M 888 3634 H 872 V 3746 H 883" class="flow"/>
+<path d="M 1600 1962 H 1630 V 3298 H 1600" class="async-flow"/>
+<path d="M 48 3448 H 32 V 3560 H 43" class="flow"/>
+<path d="M 48 3560 H 32 V 3672 H 43" class="flow"/>
+<path d="M 48 3672 H 32 V 3784 H 43" class="flow"/>
+<path d="M 48 3784 H 32 V 3896 H 43" class="flow"/>
+<path d="M 48 3896 H 32 V 4008 H 43" class="flow"/>
+<path d="M 48 4008 H 32 V 4120 H 43" class="flow"/>
+<path d="M 888 3746 H 807 V 3448 H 760" class="flow"/>
+<path d="M 888 4367 H 872 V 4455 H 883" class="flow"/>
+<path d="M 888 4455 H 872 V 4567 H 883" class="flow"/>
+<path d="M 888 4567 H 872 V 4679 H 883" class="flow"/>
+<path d="M 760 4120 H 817 V 4367 H 888" class="flow"/>
+<path d="M 48 5010 H 32 V 5122 H 43" class="flow"/>
+<path d="M 48 5122 H 32 V 5234 H 43" class="flow"/>
+<path d="M 48 5234 H 32 V 5346 H 43" class="flow"/>
+<path d="M 48 5346 H 32 V 5458 H 43" class="flow"/>
+<path d="M 48 5458 H 32 V 5570 H 43" class="flow"/>
+<path d="M 888 5010 H 872 V 5122 H 883" class="flow"/>
+<path d="M 888 5122 H 872 V 5210 H 883" class="flow"/>
+<path d="M 888 5210 H 872 V 5322 H 883" class="flow"/>
+<path d="M 888 5322 H 872 V 5434 H 883" class="flow"/>
+<path d="M 888 5434 H 872 V 5546 H 883" class="flow"/>
+<path d="M 760 5570 H 813 V 5010 H 888" class="flow"/>
+<path d="M 48 5817 H 32 V 5929 H 43" class="flow"/>
+<path d="M 48 5929 H 32 V 6041 H 43" class="flow"/>
+<path d="M 48 6041 H 32 V 6153 H 48" class="async-flow"/>
+<path d="M 48 6153 H 32 V 6265 H 43" class="flow"/>
+<path d="M 48 6265 H 32 V 6377 H 43" class="flow"/>
+<path d="M 48 6377 H 32 V 6489 H 43" class="flow"/>
+<path d="M 48 6489 H 32 V 6601 H 43" class="flow"/>
+<path d="M 888 5434 H 816 V 5817 H 760" class="flow"/>
+<path d="M 888 6027 H 872 V 6139 H 883" class="flow"/>
+<path d="M 888 6139 H 872 V 6251 H 883" class="flow"/>
+<path d="M 888 6251 H 872 V 6363 H 883" class="flow"/>
+<path d="M 888 6363 H 872 V 6475 H 888" class="async-flow"/>
+<path d="M 760 6601 H 811 V 6027 H 888" class="flow"/>
+<path d="M 48 7681 H 32 V 7793 H 48" class="holds"/>
+<path d="M 48 7793 H 32 V 7905 H 48" class="holds"/>
+<path d="M 888 7681 H 872 V 7793 H 888" class="holds"/>
+<path d="M 888 7793 H 872 V 7905 H 888" class="holds"/>
+<path d="M 760 7905 H 815 V 7681 H 888" class="holds"/>
+<path d="M 48 8255 H 32 V 8367 H 48" class="flow"/>
+<path d="M 48 8367 H 32 V 8479 H 48" class="flow"/>
+<path d="M 48 8479 H 32 V 8591 H 48" class="flow"/>
+<path d="M 48 8591 H 32 V 8703 H 48" class="flow"/>
+<path d="M 48 8703 H 32 V 8815 H 48" class="flow"/>
+<g data-label="true"><rect x="774" y="514.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="533.0" class="edge-label">进入构造器</text></g>
+<g data-label="true"><rect x="774" y="1090.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="1109.0" class="edge-label">调用父 effect</text></g>
+<g data-label="true"><rect x="774" y="1506.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="1525.0" class="edge-label">执行回调</text></g>
+<g data-label="true"><rect x="774" y="1910.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="1929.0" class="edge-label">返回清理函数</text></g>
+<g data-label="true"><rect x="774" y="3578.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="3597.0" class="edge-label">调用插件</text></g>
+<g data-label="true"><rect x="774" y="4224.5" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="4243.5" class="edge-label">插件返回</text></g>
+<g data-label="true"><rect x="774" y="5271.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="5290.0" class="edge-label">调用清理函数</text></g>
+<g data-label="true"><rect x="774" y="5606.5" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="5625.5" class="edge-label">开始卸载</text></g>
+<g data-label="true"><rect x="774" y="6295.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="6314.0" class="edge-label">资源清理完成</text></g>
+<g data-label="true"><rect x="774" y="7774.0" width="104" height="27" rx="4" fill="#f8fafc"/><text x="778" y="7793.0" class="edge-label">闭包捕获子对象</text></g>
+</svg>

@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2012 · 01 · 方法调用与依赖上下文",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    }
+  ]
+}

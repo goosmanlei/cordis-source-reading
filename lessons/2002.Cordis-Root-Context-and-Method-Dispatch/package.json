@@ -1,0 +1,19 @@
+{
+    "name": "cordis-root-context-and-method-dispatch-lesson",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "demo": "node scripts/lesson.mjs",
+        "demo:effect": "node scripts/lesson.mjs --effect",
+        "check": "npm run prepare:cordis && node --check scripts/lesson.mjs && node --check examples/02-context-assembly.mjs && node --check examples/03-fiber-effect.mjs",
+        "prepare:cordis": "tsc -p materials/cordis/tsconfig.json"
+    },
+    "dependencies": {
+        "cordis": "file:materials/cordis"
+    },
+    "devDependencies": {
+        "@types/node": "26.0.0",
+        "tsx": "4.23.15",
+        "typescript": "6.0.3"
+    }
+}

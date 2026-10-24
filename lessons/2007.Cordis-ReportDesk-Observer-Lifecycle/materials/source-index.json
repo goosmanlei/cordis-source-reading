@@ -1,0 +1,98 @@
+{
+  "repository": "cordiverse/cordis",
+  "commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+  "scope": "All core source modules and selected event disposal tests. Independent editable initial baseline; not the complete upstream test environment.",
+  "files": [
+    {
+      "path": "cordis/src/context.ts",
+      "upstream_path": "packages/core/src/context.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/context.ts",
+      "sha256": "118a4e9befb99ee7e00cce78f3210b34e1d039ea11c2abd1484a4ae00b937528",
+      "bytes": 2639
+    },
+    {
+      "path": "cordis/src/events.ts",
+      "upstream_path": "packages/core/src/events.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/events.ts",
+      "sha256": "890e37b3b95ff022ca18bc4b2890295d49d6d052e66595efdcaf6e41898d5c59",
+      "bytes": 8082
+    },
+    {
+      "path": "cordis/src/fiber.ts",
+      "upstream_path": "packages/core/src/fiber.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/fiber.ts",
+      "sha256": "e24ec0e395d5b7310e8b546b9689659f05085d594f2bb17ded637c0c6d8616bc",
+      "bytes": 14823
+    },
+    {
+      "path": "cordis/src/index.ts",
+      "upstream_path": "packages/core/src/index.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/index.ts",
+      "sha256": "a596f3da4463411079c96921c0e8b3ca480140b5096f434a20213ebc425abe83",
+      "bytes": 177
+    },
+    {
+      "path": "cordis/src/logger.ts",
+      "upstream_path": "packages/core/src/logger.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/logger.ts",
+      "sha256": "074a9f1a5fa84a6da7724de7fc04707bc007fff7185650149bb32342d3bddb8c",
+      "bytes": 7314
+    },
+    {
+      "path": "cordis/src/reflect.ts",
+      "upstream_path": "packages/core/src/reflect.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/reflect.ts",
+      "sha256": "53fbc89517a73c080d9c387f46d1b24aa317ddf2cdd63a04750149820c299e1a",
+      "bytes": 9822
+    },
+    {
+      "path": "cordis/src/registry.ts",
+      "upstream_path": "packages/core/src/registry.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/registry.ts",
+      "sha256": "258d0d5408be00a651701363296d9af9f4cfda02450c11143e8da402fb9c845f",
+      "bytes": 6209
+    },
+    {
+      "path": "cordis/src/service.ts",
+      "upstream_path": "packages/core/src/service.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/service.ts",
+      "sha256": "6cd699bf7ff394d74250243795b080c1cbffd6759767cd238c7381fbe3357cfb",
+      "bytes": 2495
+    },
+    {
+      "path": "cordis/src/utils.ts",
+      "upstream_path": "packages/core/src/utils.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/src/utils.ts",
+      "sha256": "0b92ca0feb7587cde8f0a33a5b7b45f4bcca6a483e1f2c4de2acfbb38aa6f73f",
+      "bytes": 9784
+    },
+    {
+      "path": "cordis/upstream-package.json",
+      "upstream_path": "packages/core/package.json",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/package.json",
+      "sha256": "21c0d06a88e120b2f1538e8b2ac05db2492263f26c6210d58f1ab639b660cdab",
+      "bytes": 1134
+    },
+    {
+      "path": "cordis/README.md",
+      "upstream_path": "packages/core/README.md",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/README.md",
+      "sha256": "19dab093b65d126f083c5ccdaa09dc27ca77ee0cd59974d51cfedf8af7708762",
+      "bytes": 534
+    },
+    {
+      "path": "cordis/LICENSE",
+      "upstream_path": "LICENSE",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/LICENSE",
+      "sha256": "034fb52b1d57360ecbae6cb1632a88f86fd7c3d3f5631a5f082710203dda0be7",
+      "bytes": 1071
+    },
+    {
+      "path": "cordis/events.spec.ts",
+      "upstream_path": "packages/core/tests/events.spec.ts",
+      "url": "https://raw.githubusercontent.com/cordiverse/cordis/c261dd2c13d65b1994adb1cdc10d7dba61542523/packages/core/tests/events.spec.ts",
+      "sha256": "698fd3bbdfd9c48750bb85fb87e79a2140e3a09c45777e1b0e89153f0b335aaa",
+      "bytes": 10944
+    }
+  ]
+}

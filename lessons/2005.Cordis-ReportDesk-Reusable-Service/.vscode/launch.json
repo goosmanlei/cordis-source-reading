@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2005 · 01 · 报告服务",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [
+        "{\"includeExcerpt\":true}"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    },
+    {
+      "name": "Cordis 2005 · 01 · 建设起点",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-reportdesk/start.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "args": [],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    }
+  ]
+}

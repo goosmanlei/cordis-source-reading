@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1140" viewBox="0 0 1240 1140" role="img" aria-label="M1.2.3 两次报告调用的对象关系与结束时的清理"><rect width="100%" height="100%" fill="#f8fafc"/><defs>
+<marker id="blue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#2563eb"/></marker>
+<marker id="purple" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#9333ea"/></marker>
+<marker id="orange" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#c2410c"/></marker>
+<marker id="gray" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#475569"/></marker>
+</defs><style>text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;fill:#17243b}.title{font-size:25px;font-weight:700}.name{font-size:20px;font-weight:700}.body{font-size:17px}.note{font-size:17px;fill:#475569}</style>
+<text x="30" y="38" class="title">M1.2.3 · 同一个报告服务，两个调用位置</text>
+<text x="30" y="70" class="note">蓝色 = 原型；紫色虚线 = shadow 引用；灰色 = 标注的持有／解析关系；橙色 = 调用先后。</text>
+<text x="30" y="96" class="note">这是两次调用所用对象的汇总：虚线框是各次 render 内的临时 methodCtx，并非结束后仍被保存的对象。</text>
+<rect x="450" y="135" width="340" height="110" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="465" y="165" class="name">originalReport · 共享原对象</text>
+<text x="465" y="196" class="body">自身 ctx → reportDefinitionCtx</text>
+<text x="465" y="221" class="body">A、B 均使用这个 ReportService</text>
+<path d="M620 245 V320" fill="none" stroke="#475569" stroke-width="2.5" marker-end="url(#gray)"/>
+<text x="632" y="282" class="body" style="fill:#475569">ctx 引用保持不变</text>
+<rect x="450" y="320" width="340" height="125" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="465" y="350" class="name">reportDefinitionCtx</text>
+<text x="465" y="381" class="body">= reportFiber.ctx</text>
+<text x="465" y="406" class="body">定义位置；所属插件 inject: storage</text>
+<text x="465" y="431" class="body">此处没有请求 A/B 的标签</text>
+<rect x="450" y="570" width="340" height="100" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="465" y="600" class="name">storage 服务对象</text>
+<text x="465" y="631" class="body">save(text)：返回内存字符串</text>
+<text x="465" y="656" class="body">由 storagePlugin 登记</text>
+<path d="M620 445 V463 M620 536 V570" fill="none" stroke="#475569" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#gray)"/>
+<text x="455" y="490" class="body" style="fill:#475569">按定义位置所属插件的依赖记录</text>
+<text x="485" y="516" class="body" style="fill:#475569">解析 methodCtx.storage</text>
+<rect x="30" y="320" width="300" height="125" rx="12" fill="white" stroke="#9333ea" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="45" y="350" class="name">methodCtx · 调用 A</text>
+<text x="45" y="381" class="body">自身 [symbols.shadow]</text>
+<text x="45" y="406" class="body">    → reportDefinitionCtx</text>
+<text x="45" y="431" class="body">本次 render 中 this.ctx 的值</text>
+<rect x="30" y="570" width="300" height="100" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="45" y="600" class="name">callerA.ctx</text>
+<text x="45" y="631" class="body">调用方插件 Context</text>
+<text x="45" y="656" class="body">inject: report；无自有请求标签</text>
+<rect x="30" y="755" width="300" height="100" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="45" y="785" class="name">请求 A 的分支</text>
+<text x="45" y="816" class="body">自身 requestLabel = &quot;请求 A&quot;</text>
+<text x="45" y="841" class="body">root.extend(...) 返回的对象</text>
+<path d="M180 445 V570" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<text x="192" y="510" class="body" style="fill:#2563eb">原型</text>
+<path d="M180 670 V755" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<text x="192" y="714" class="body" style="fill:#2563eb">原型</text>
+<rect x="910" y="320" width="300" height="125" rx="12" fill="white" stroke="#9333ea" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="925" y="350" class="name">methodCtx · 调用 B</text>
+<text x="925" y="381" class="body">自身 [symbols.shadow]</text>
+<text x="925" y="406" class="body">    → reportDefinitionCtx</text>
+<text x="925" y="431" class="body">本次 render 中 this.ctx 的值</text>
+<rect x="910" y="570" width="300" height="100" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="925" y="600" class="name">callerB.ctx</text>
+<text x="925" y="631" class="body">调用方插件 Context</text>
+<text x="925" y="656" class="body">inject: report；无自有请求标签</text>
+<rect x="910" y="755" width="300" height="100" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="925" y="785" class="name">请求 B 的分支</text>
+<text x="925" y="816" class="body">自身 requestLabel = &quot;请求 B&quot;</text>
+<text x="925" y="841" class="body">root.extend(...) 返回的对象</text>
+<path d="M1060 445 V570" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<text x="1072" y="510" class="body" style="fill:#2563eb">原型</text>
+<path d="M1060 670 V755" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<text x="1072" y="714" class="body" style="fill:#2563eb">原型</text>
+<path d="M330 380 H450" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#purple)"/>
+<text x="342" y="364" class="body" style="fill:#9333ea">shadow</text>
+<path d="M910 380 H790" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#purple)"/>
+<text x="815" y="364" class="body" style="fill:#9333ea">shadow</text>
+<rect x="450" y="930" width="340" height="80" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="465" y="960" class="name">root · 根 Context Proxy</text>
+<text x="465" y="991" class="body">本图省略内部服务与后续原型</text>
+<path d="M180 855 V890 H530 V930" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<path d="M1060 855 V890 H710 V930" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<path d="M790 420 H860 V955 H790" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#blue)"/>
+<text x="804" y="706" class="body" style="fill:#2563eb">原型</text>
+<path d="M30 605 H12 V190 H450" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/>
+<text x="35" y="175" class="body" style="fill:#c2410c">① A 经 report 访问视图调用 render</text>
+<path d="M1210 605 H1228 V190 H790" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/>
+<text x="830" y="175" class="body" style="fill:#c2410c">② B 经 report 访问视图调用 render</text>
+<text x="30" y="1050" class="note">读取标签：methodCtx → callerA/B.ctx → 对应分支；读取 storage：识别 shadow → 使用定义位置的依赖记录。</text>
+<text x="30" y="1082" class="note">橙色线省略了服务视图与方法 this 的代理层；临时 methodCtx 由 createShadow 自动构造，未改写 originalReport.ctx。</text>
+<text x="30" y="1114" class="note">真正结束时：finally 依次释放 B、A、report、storage，移除服务登记；本例不再保留这些局部引用。</text>
+</svg>

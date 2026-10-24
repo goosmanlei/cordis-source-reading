@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="670" viewBox="0 0 1600 670" role="img" aria-labelledby="title desc">
+  <title id="title">两个调用视图共享一个 ReportService</title>
+  <desc id="desc">manual 和 scheduled 的调用 Context 各自读取 ctx.report，创建不同代理。两个代理的 target 是同一 ReportService，外部读取各代理的 ctx 返回各自 useSite，不改写原始服务 ctx。</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10" fill="none" stroke="#55728d" stroke-width="1.5"/></marker></defs>
+  <rect width="1600" height="670" fill="#f7fafc"/>
+  <g font-family="PingFang SC,Microsoft YaHei,sans-serif" fill="#18324a">
+    <text x="65" y="62" font-size="34" font-weight="600">读取 ctx.report：不同访问代理，同一个服务实现</text>
+    <text x="65" y="105" font-size="22">只表示服务读取和对象关联；不表示 generate 方法内部的调用时序。</text>
+    <rect x="65" y="160" width="365" height="145" rx="14" fill="#e6f0fb" stroke="#98b9d8"/>
+    <text x="90" y="200" font-size="22" font-weight="600">reportBatch：manual 的 ctx</text>
+    <text x="90" y="241" font-size="24">entryLabel = "manual"</text>
+    <text x="90" y="278" font-size="22">Fiber 7，inject: ["report"]</text>
+    <rect x="65" y="375" width="365" height="145" rx="14" fill="#e6f0fb" stroke="#98b9d8"/>
+    <text x="90" y="415" font-size="22" font-weight="600">reportBatch：scheduled 的 ctx</text>
+    <text x="90" y="456" font-size="24">entryLabel = "scheduled"</text>
+    <text x="90" y="493" font-size="22">Fiber 8，inject: ["report"]</text>
+    <rect x="615" y="160" width="340" height="145" rx="14" fill="#e7f5ef" stroke="#9bc9b5"/>
+    <text x="640" y="200" font-size="26" font-weight="600">manual 的 reportView</text>
+    <text x="640" y="241" font-size="23">new Proxy(value, handler)</text>
+    <text x="640" y="278" font-size="20">闭包 useSite = manual 的 ctx</text>
+    <rect x="615" y="375" width="340" height="145" rx="14" fill="#e7f5ef" stroke="#9bc9b5"/>
+    <text x="640" y="415" font-size="26" font-weight="600">scheduled 的 reportView</text>
+    <text x="640" y="456" font-size="23">new Proxy(value, handler)</text>
+    <text x="640" y="493" font-size="20">闭包 useSite = scheduled 的 ctx</text>
+    <rect x="1150" y="245" width="385" height="235" rx="14" fill="#fff3dc" stroke="#d9bd84"/>
+    <text x="1175" y="287" font-size="27" font-weight="600">原始 ReportService</text>
+    <text x="1175" y="331" font-size="24">impl.value / proxy target</text>
+    <text x="1175" y="372" font-size="24">instanceId = 1</text>
+    <text x="1175" y="411" font-size="22">ctx = reportProvider 的 Context</text>
+    <text x="1175" y="450" font-size="22">其 entryLabel 仍为 "default"</text>
+    <g stroke="#55728d" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M430 229 H601"/><path d="M430 446 H601"/>
+      <path d="M955 235 L1136 310"/><path d="M955 445 L1136 395"/>
+    </g>
+    <text x="452" y="207" font-size="22">读取 ctx.report</text>
+    <text x="452" y="424" font-size="22">读取 ctx.report</text>
+    <text x="1000" y="249" font-size="22">target</text>
+    <text x="1000" y="455" font-size="22">target</text>
+    <text x="65" y="588" font-size="25">外部读取 reportView.ctx → 返回各自 useSite；没有给原始服务的 ctx 赋新值。</text>
+    <text x="65" y="631" font-size="23">同一 ctx 再读一次 report，也会新建代理；共享实现不能用代理的 === 判断。</text>
+  </g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="510" viewBox="0 0 950 510" role="img" aria-label="M1.2.1 · 执行结束时：两个分支，共用一个根">
+<defs><marker id="blue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#2563eb"/></marker><marker id="purple" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#9333ea"/></marker><marker id="orange" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#c2410c"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<style>text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;fill:#17243b} .title{font-size:25px;font-weight:700} .name{font-size:21px;font-weight:700} .body{font-size:18px} .note{font-size:17px;fill:#475569} .edge{font-size:17px;fill:#2563eb}.call{font-size:17px;fill:#c2410c}.callname{font-size:20px;fill:#9a3412;font-weight:700}</style>
+<text x="30" y="40" class="title">M1.2.1 · 执行结束时：两个分支，共用一个根</text><text x="30" y="72" class="note">橙色：调用者 → extend 返回对象，①② 为调用顺序；蓝色：原型指向。</text>
+<rect x="45" y="115" width="360" height="110" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="63" y="148" class="name">branchA</text>
+<text x="63" y="180" class="body">自身 label = &quot;branch-A&quot;</text>
+<text x="63" y="207" class="body">没有自有 shadow 属性</text>
+<rect x="545" y="115" width="360" height="110" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="563" y="148" class="name">branchB</text>
+<text x="563" y="180" class="body">自身 label = &quot;branch-B&quot;</text>
+<text x="563" y="207" class="body">没有自有 shadow 属性</text>
+<path d="M225 225 V265 H400 V305" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<path d="M725 225 V265 H550 V305" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<text x="70" y="265" class="edge">[[Prototype]]（原型）</text>
+<text x="735" y="265" class="edge">原型</text>
+<rect x="275" y="305" width="400" height="100" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="293" y="338" class="name">root · 根 Context 的 Proxy</text>
+<text x="293" y="370" class="body">没有自有 label，也没有自有 shadow</text>
+<text x="30" y="441" class="note">蓝色实线：Object.getPrototypeOf(起点) === 终点。根代理的内部对象、服务与后续原型省略。</text>
+
+<path d="M275 365 H20 V165 H45" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/><text x="35" y="320" class="call">① extend</text><path d="M675 365 H930 V165 H905" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/><text x="790" y="320" class="call">② extend</text><text x="30" y="480" class="call">① root.extend({ label: "branch-A" })；② root.extend({ label: "branch-B" })</text></svg>

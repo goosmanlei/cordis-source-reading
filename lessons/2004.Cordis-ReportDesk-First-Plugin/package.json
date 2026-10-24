@@ -1,0 +1,20 @@
+{
+    "name": "cordis-2004-reportdesk-first-plugin",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prepare": "node scripts/prepare-cordis.mjs",
+        "check": "npm run prepare && tsc --noEmit",
+        "demo": "node --import tsx examples/01-reportdesk/main.ts",
+        "demo:start": "node --import tsx examples/01-reportdesk/start.ts",
+        "demo:excerpt": "node --import tsx examples/01-reportdesk/main.ts --with-excerpt"
+    },
+    "dependencies": {
+        "cordis": "file:materials/cordis"
+    },
+    "devDependencies": {
+        "@types/node": "26.0.0",
+        "tsx": "4.23.15",
+        "typescript": "6.0.3"
+    }
+}

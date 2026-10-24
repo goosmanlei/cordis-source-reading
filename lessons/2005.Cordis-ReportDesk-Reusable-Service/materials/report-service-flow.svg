@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="550" viewBox="0 0 1000 550" role="img" aria-labelledby="title desc">
+  <title id="title">ReportDesk 报告服务的登记与使用</title>
+  <desc id="desc">提供方创建 ReportService，provide 将它放入 impl.value；调用方依赖就绪后持有同一实现记录，经 ctx.report 取得访问入口，为两份输入生成报告。</desc>
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#335c85"/></marker>
+  </defs>
+  <rect width="1000" height="550" rx="16" fill="#f4f7fb"/>
+  <g font-family="system-ui, sans-serif" fill="#172f49">
+    <text x="35" y="40" font-size="23" font-weight="bold">同一份服务实现，两个业务请求</text>
+    <rect x="35" y="70" width="285" height="130" rx="10" fill="#e1efff" stroke="#648fba"/>
+    <text x="52" y="99" font-size="19" font-weight="bold">reportProvider(ctx)</text>
+    <text x="52" y="130" font-size="17">new ReportService(ctx)</text>
+    <text x="52" y="163" font-size="17">super(ctx, "report")</text>
+    <rect x="415" y="70" width="545" height="130" rx="10" fill="#fff" stroke="#648fba"/>
+    <text x="435" y="99" font-size="19" font-weight="bold">impl：服务实现记录</text>
+    <text x="435" y="130" font-size="17">name = "report" · value = ReportService 实例</text>
+    <text x="435" y="163" font-size="17">fiber = 提供方的本次运行记录</text>
+    <path d="M320 140 H414" stroke="#335c85" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <text x="330" y="121" font-size="16">provide</text>
+    <rect x="35" y="265" width="355" height="90" rx="10" fill="#fff" stroke="#648fba"/>
+    <text x="53" y="295" font-size="18" font-weight="bold">reflect.store[key]</text>
+    <text x="53" y="326" font-size="17">提供方 fiber.store.report</text>
+    <path d="M390 294 H460 V205" stroke="#335c85" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <text x="470" y="238" font-size="16">指向同一记录</text>
+    <rect x="610" y="265" width="350" height="90" rx="10" fill="#e4f4eb" stroke="#689b7a"/>
+    <text x="628" y="295" font-size="18" font-weight="bold">reportBatch 的依赖已就绪</text>
+    <text x="628" y="326" font-size="17">调用方 fiber.store.report</text>
+    <path d="M795 265 V205" stroke="#335c85" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <rect x="35" y="418" width="495" height="95" rx="10" fill="#e4f4eb" stroke="#689b7a"/>
+    <text x="53" y="449" font-size="18" font-weight="bold">const report = ctx.report</text>
+    <text x="53" y="481" font-size="17">命中 impl → getTraceable(ctx, impl.value)</text>
+    <path d="M610 338 H552 V400 H285 V416" stroke="#335c85" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <text x="579" y="391" font-size="16">读取</text>
+    <rect x="660" y="418" width="300" height="95" rx="10" fill="#fff0d9" stroke="#bfa16c"/>
+    <text x="678" y="449" font-size="18" font-weight="bold">report.generate(input)</text>
+    <text x="678" y="481" font-size="16">返回 Markdown，由调用方写文件</text>
+    <path d="M530 466 H657" stroke="#335c85" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <text x="549" y="448" font-size="16">调用／返回</text>
+  </g>
+</svg>

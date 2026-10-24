@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="960" viewBox="0 0 1140 960" role="img" aria-label="M1.2.2 · 执行结束时：定义位置保留，使用位置派生">
+<defs><marker id="blue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#2563eb"/></marker><marker id="purple" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#9333ea"/></marker><marker id="orange" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,1 L9,5 L0,9" fill="#c2410c"/></marker></defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+<style>text{font-family:"PingFang SC","Microsoft YaHei",sans-serif;fill:#17243b} .title{font-size:25px;font-weight:700} .name{font-size:21px;font-weight:700} .body{font-size:18px} .note{font-size:17px;fill:#475569} .edge{font-size:17px;fill:#2563eb}.call{font-size:17px;fill:#c2410c}.callname{font-size:20px;fill:#9a3412;font-weight:700}</style>
+<text x="30" y="40" class="title">M1.2.2 · 执行结束时：定义位置保留，使用位置派生</text><text x="30" y="72" class="note">蓝色：原型；紫色虚线：shadow 引用；橙色：调用者 → extend 返回对象，数字为顺序。</text>
+<path d="M200 240 V355" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<text x="215" y="300" class="edge">原型</text>
+<path d="M200 485 V610" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<text x="215" y="550" class="edge">原型</text>
+<path d="M360 675 H680" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<text x="450" y="665" class="edge">原型</text>
+<path d="M840 485 V610" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<text x="855" y="550" class="edge">原型</text>
+<path d="M680 185 H535 V635 H360" fill="none" stroke="#2563eb" stroke-width="2.5"  marker-end="url(#blue)"/>
+<text x="545" y="580" class="edge">shadowCtx 的原型</text>
+<path d="M840 240 V355" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#purple)"/>
+<text x="852" y="297" class="note">shadow 引用</text>
+<path d="M360 165 H445 V325 H760 V355" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-dasharray="8 6" marker-end="url(#purple)"/>
+<text x="450" y="314" class="note">shadow 引用（同一个 definitionCtx）</text>
+<rect x="40" y="110" width="320" height="130" rx="12" fill="white" stroke="#9333ea" stroke-width="2"/>
+<text x="58" y="143" class="name">extended</text>
+<text x="58" y="175" class="body">自身 [symbols.shadow]</text>
+<text x="58" y="202" class="body">    → definitionCtx</text>
+<text x="58" y="229" class="body">没有自有 label</text>
+<rect x="680" y="110" width="320" height="130" rx="12" fill="white" stroke="#9333ea" stroke-width="2"/>
+<text x="698" y="143" class="name">shadowCtx</text>
+<text x="698" y="175" class="body">自身 [symbols.shadow]</text>
+<text x="698" y="202" class="body">    → definitionCtx</text>
+<text x="698" y="229" class="body">没有自有 label</text>
+<rect x="40" y="355" width="320" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="58" y="388" class="name">extendedUseCtx = self</text>
+<text x="58" y="420" class="body">自身 label = &quot;新使用位置&quot;</text>
+<text x="58" y="447" class="body">没有自有 shadow</text>
+<text x="58" y="474" class="body">第二次 extend 中新建的对象</text>
+<rect x="680" y="355" width="320" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="698" y="388" class="name">definitionCtx</text>
+<text x="698" y="420" class="body">自身 label = &quot;定义位置&quot;</text>
+<text x="698" y="447" class="body">没有自有 shadow</text>
+<rect x="40" y="610" width="320" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="58" y="643" class="name">useCtx</text>
+<text x="58" y="675" class="body">自身 label = &quot;原使用位置&quot;</text>
+<text x="58" y="702" class="body">没有自有 shadow</text>
+<rect x="680" y="610" width="320" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="698" y="643" class="name">root · 根 Context Proxy</text>
+<text x="698" y="675" class="body">没有自有 label / shadow</text>
+<text x="698" y="702" class="body">根代理内部与后续原型省略</text>
+<text x="30" y="850" class="note">读取 extended.label：extended 没有 → 沿原型到 extendedUseCtx → 得到“新使用位置”。</text>
+<text x="30" y="880" class="note">原 shadowCtx 仍继承 useCtx；新链路未经过 shadowCtx。definitionCtx 也没有被复制。</text>
+
+<path d="M1000 660 H1030 V430 H1000" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/><text x="1038" y="550" class="call">① extend</text><path d="M840 740 V780 H200 V740" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/><text x="460" y="770" class="call">② extend</text><path d="M360 715 H400 V755 H830 M850 755 H1120 V205 H1000" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/><text x="1038" y="280" class="call">③ extend</text><path d="M680 130 H360" fill="none" stroke="#c2410c" stroke-width="2.5" marker-end="url(#orange)"/><text x="470" y="120" class="call">④ extend</text><text x="30" y="915" class="call">①② 准备 definitionCtx / useCtx；③ 加入 shadow；④ 派生新使用位置并保留 shadow。</text><text x="30" y="943" class="call">④ 内部先创建 self（extendedUseCtx），再返回 extended；它们不是两次 extend 调用。</text></svg>

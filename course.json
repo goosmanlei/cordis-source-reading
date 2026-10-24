@@ -1,0 +1,100 @@
+[
+  {
+    "id": "2001",
+    "title": "Context 与函数插件的装载路径",
+    "directory": "lessons/2001.Cordis-Context-and-Function-Plugins",
+    "upstream_commit": "f8ea3cd50f1a5724e8e715995bcde131c9c12b2c",
+    "notebook_cells": 29
+  },
+  {
+    "id": "2002",
+    "title": "根 Context 装配与方法转发",
+    "directory": "lessons/2002.Cordis-Root-Context-and-Method-Dispatch",
+    "upstream_commit": "f8ea3cd50f1a5724e8e715995bcde131c9c12b2c",
+    "notebook_cells": 36
+  },
+  {
+    "id": "2003",
+    "title": "Context 派生与 shadow",
+    "directory": "lessons/2003.Cordis-Context-Views-and-Method-Binding",
+    "upstream_commit": "f8ea3cd50f1a5724e8e715995bcde131c9c12b2c",
+    "notebook_cells": 26
+  },
+  {
+    "id": "2004",
+    "title": "ReportDesk 的第一个报告插件",
+    "directory": "lessons/2004.Cordis-ReportDesk-First-Plugin",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 23
+  },
+  {
+    "id": "2005",
+    "title": "可复用的报告服务",
+    "directory": "lessons/2005.Cordis-ReportDesk-Reusable-Service",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 23
+  },
+  {
+    "id": "2006",
+    "title": "事件、通知与统计",
+    "directory": "lessons/2006.Cordis-ReportDesk-Events-and-Observers",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 25
+  },
+  {
+    "id": "2007",
+    "title": "观察插件卸载与重装",
+    "directory": "lessons/2007.Cordis-ReportDesk-Observer-Lifecycle",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 27
+  },
+  {
+    "id": "2008",
+    "title": "存储依赖的停用与恢复",
+    "directory": "lessons/2008.Cordis-ReportDesk-Storage-Dependency",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 21
+  },
+  {
+    "id": "2009",
+    "title": "可插拔的格式处理",
+    "directory": "lessons/2009.Cordis-ReportDesk-Format-Plugins",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 20
+  },
+  {
+    "id": "2010",
+    "title": "运行中的配置更新",
+    "directory": "lessons/2010.Cordis-ReportDesk-Config-Update",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 21
+  },
+  {
+    "id": "2011",
+    "title": "同一服务的两个调用视图",
+    "directory": "lessons/2011.Cordis-ReportDesk-Service-Views",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 20
+  },
+  {
+    "id": "2012",
+    "title": "方法调用中的 this 与依赖上下文",
+    "directory": "lessons/2012.Cordis-ReportDesk-Method-Context",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 25
+  },
+  {
+    "id": "2013",
+    "title": "两个独立工作区",
+    "directory": "lessons/2013.Cordis-ReportDesk-Workspace-Isolation",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 25
+  },
+  {
+    "id": "2014",
+    "title": "完整流程与对象图解",
+    "directory": "lessons/2014.Cordis-ReportDesk-Full-Flow",
+    "upstream_commit": "c261dd2c13d65b1994adb1cdc10d7dba61542523",
+    "notebook_cells": 26
+  }
+]

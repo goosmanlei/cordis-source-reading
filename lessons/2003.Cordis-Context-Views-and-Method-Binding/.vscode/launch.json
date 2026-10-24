@@ -1,0 +1,65 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2003 · M1.2.1 · 分支与原型",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-m1-context-branches.mjs",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    },
+    {
+      "name": "Cordis 2003 · M1.2.2 · shadow 与 extend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-m1-shadow-extend.mjs",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    },
+    {
+      "name": "Cordis 2003 · M1.2.3 · shadow 应用场景",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/02-shadow-application.mjs",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    }
+  ]
+}

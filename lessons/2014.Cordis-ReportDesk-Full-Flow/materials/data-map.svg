@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1280" viewBox="0 0 1440 1280" role="img" aria-label="登记数据：名字、全局实现与本轮绑定">
+<rect width="1440" height="1280" fill="#f8fafc"/>
+<style>text{font-family:"PingFang SC","Noto Sans CJK SC",sans-serif;fill:#18324b;font-size:22px}.title{font-size:32px;font-weight:700}.small{font-size:19px}.head{font-size:24px;font-weight:700}</style>
+<text x="40" y="48" class="title">登记数据：名字、全局实现与本轮绑定</text>
+<text x="40" y="85" class="small">alpha/beta 是同一机制的两份实例；reportAlpha 等为不同 Symbol 的讲解别名。</text>
+<rect x="40" y="140" width="400" height="185" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="176" class="head">alphaCtx 的有效映射</text>
+<text x="60" y="215" class="">report → reportAlpha</text>
+<text x="60" y="249" class="">storage → storageAlpha</text>
+<text x="60" y="283" class="">局部覆盖继承的默认键</text>
+<rect x="560" y="140" width="840" height="185" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="580" y="176" class="head">共享 reflect.store：alpha 的实现记录</text>
+<text x="580" y="215" class="">reportAlpha → Impl { value: ReportService 1, fiber: 9 }</text>
+<text x="580" y="249" class="">storageAlpha → Impl { value: StorageService 1, fiber: 7 }</text>
+<text x="580" y="283" class="">value 是业务实例；fiber 是提供者的装载记录</text>
+<path d="M440 230 L560 230" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="560,230 549.0,225.0 549.0,235.0" fill="#64748b"/>
+<text x="481.0" y="218.0" class="small">选键</text>
+<rect x="560" y="395" width="840" height="175" rx="12" fill="white" stroke="#15803d" stroke-width="2"/>
+<text x="580" y="431" class="head">alpha report Fiber 的依赖</text>
+<text x="580" y="470" class="">_checkImpl：候选 _store.storage → alpha storage Impl</text>
+<text x="580" y="504" class="">_reload：store = { ..._store }</text>
+<text x="580" y="538" class="">方法读取：store.storage.value → StorageService 1</text>
+<path d="M980 395 L980 325" fill="none" stroke="#15803d" stroke-width="2.5" stroke-dasharray="7 5"/>
+<polygon points="980,325 975.0,336.0 985.0,336.0" fill="#15803d"/>
+<text x="988.0" y="348.0" class="small">引用同一 Impl</text>
+<text x="65" y="440" class="small">装载前：按键检查候选依赖。</text>
+<text x="65" y="480" class="small">运行时：读取本轮依赖绑定。</text>
+<text x="65" y="520" class="small">浅复制依赖表，不复制业务实例。</text>
+<rect x="40" y="640" width="400" height="185" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="676" class="head">betaCtx 的有效映射</text>
+<text x="60" y="715" class="">report → reportBeta</text>
+<text x="60" y="749" class="">storage → storageBeta</text>
+<text x="60" y="783" class="">四个 Symbol 身份不同</text>
+<rect x="560" y="640" width="840" height="185" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="580" y="676" class="head">共享 reflect.store：beta 的实现记录</text>
+<text x="580" y="715" class="">reportBeta → Impl { value: ReportService 2, fiber: 10 }</text>
+<text x="580" y="749" class="">storageBeta → Impl { value: StorageService 2, fiber: 8 }</text>
+<text x="580" y="783" class="">两组使用一张共享表，不复制整个登记表</text>
+<path d="M440 730 L560 730" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="560,730 549.0,725.0 549.0,735.0" fill="#64748b"/>
+<text x="481.0" y="718.0" class="small">选键</text>
+<rect x="560" y="895" width="840" height="175" rx="12" fill="white" stroke="#15803d" stroke-width="2"/>
+<text x="580" y="931" class="head">beta report Fiber 的依赖</text>
+<text x="580" y="970" class="">_checkImpl：候选 _store.storage → beta storage Impl</text>
+<text x="580" y="1004" class="">_reload：store = { ..._store }</text>
+<text x="580" y="1038" class="">方法读取：store.storage.value → StorageService 2</text>
+<path d="M980 895 L980 825" fill="none" stroke="#15803d" stroke-width="2.5" stroke-dasharray="7 5"/>
+<polygon points="980,825 975.0,836.0 985.0,836.0" fill="#15803d"/>
+<text x="988.0" y="848.0" class="small">引用同一 Impl</text>
+<text x="65" y="950" class="small">相同名字，不同有效键。</text>
+<text x="65" y="990" class="small">相同插件回调，不同装载与实例。</text>
+<rect x="40" y="1120" width="1360" height="95" rx="12" fill="white" stroke="#64748b" stroke-width="2"/>
+<text x="60" y="1156" class="head">名字存在 ≠ 当前有可用实现</text>
+<text x="60" y="1195" class="">根默认键可以已补齐，但键下没有实例。本例根 get(report/storage) 均为空，局部服务照常可用。</text>
+<text x="40" y="1255" class="small">Cordis c261dd2 · 结构与中间阶段按固定源码归纳；本例快照及分支执行范围见 Notebook。</text>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1480" viewBox="0 0 1440 1480" role="img" aria-label="装载流程：从 ctx.plugin() 到服务可用">
+<rect width="1440" height="1480" fill="#f8fafc"/>
+<style>text{font-family:"PingFang SC","Noto Sans CJK SC",sans-serif;fill:#18324b;font-size:22px}.title{font-size:32px;font-weight:700}.small{font-size:19px}.head{font-size:24px;font-weight:700}</style>
+<text x="40" y="48" class="title">装载流程：从 ctx.plugin() 到服务可用</text>
+<text x="40" y="85" class="small">以 reportProvider 为例；batch 使用相同装载机制，在自己的 apply 中执行业务。</text>
+<rect x="40" y="130" width="880" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="166" class="head">1 · 当前 Context 调用 plugin</text>
+<text x="60" y="205" class="">混入方法转发到共享 registry，保留调用位置。</text>
+<rect x="40" y="340" width="880" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="376" class="head">2 · 找 Runtime，建立本次 Fiber</text>
+<text x="60" y="415" class="">ctx = parent.extend({ fiber })；保存 config、inject 与 runtime。</text>
+<rect x="40" y="550" width="880" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="586" class="head">3 · 检查依赖，再接入父级资源管理</text>
+<text x="60" y="625" class="">按隔离键找 ACTIVE 的 storage Impl，记录到候选 _store。</text>
+<text x="60" y="659" class="">父级 effect 登记本次装载与释放动作，_refresh 决定是否加载。</text>
+<rect x="40" y="760" width="880" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="796" class="head">4 · _reload 准备本轮依赖并执行 apply</text>
+<text x="60" y="835" class="">store = { ..._store }；经过异步边界后调用插件回调。</text>
+<rect x="40" y="970" width="880" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="1006" class="head">5 · reportProvider 创建并登记业务实例</text>
+<text x="60" y="1045" class="">new ReportService → Service 构造器 → reflect.provide。</text>
+<rect x="40" y="1180" width="880" height="130" rx="12" fill="white" stroke="#2563eb" stroke-width="2"/>
+<text x="60" y="1216" class="head">6 · 本轮装载完成，提供者进入 ACTIVE</text>
+<text x="60" y="1255" class="">状态变化通知相关消费者重新检查，reportBatch 可绑定 report。</text>
+<path d="M480 260 L480 340" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="480,340 485.0,329.0 475.0,329.0" fill="#64748b"/>
+<path d="M480 470 L480 550" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="480,550 485.0,539.0 475.0,539.0" fill="#64748b"/>
+<path d="M480 680 L480 760" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="480,760 485.0,749.0 475.0,749.0" fill="#64748b"/>
+<path d="M480 890 L480 970" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="480,970 485.0,959.0 475.0,959.0" fill="#64748b"/>
+<path d="M480 1100 L480 1180" fill="none" stroke="#64748b" stroke-width="2.5"/>
+<polygon points="480,1180 485.0,1169.0 475.0,1169.0" fill="#64748b"/>
+<rect x="980" y="130" width="420" height="220" rx="12" fill="white" stroke="#64748b" stroke-width="2"/>
+<text x="1000" y="166" class="head">身份分开</text>
+<text x="1000" y="205" class="">Runtime 按回调复用；</text>
+<text x="1000" y="239" class="">Fiber 按安装创建；</text>
+<text x="1000" y="273" class="">Service 由 apply 中的</text>
+<text x="1000" y="307" class="">应用代码创建。</text>
+<rect x="980" y="515" width="420" height="250" rx="12" fill="white" stroke="#b45309" stroke-width="2"/>
+<text x="1000" y="551" class="head">依赖暂缺 · 源码分支</text>
+<text x="1000" y="590" class="">Fiber 可以已经登记，</text>
+<text x="1000" y="624" class="">但仍 PENDING，未执行 apply。</text>
+<text x="1000" y="658" class="">提供者就绪后重新检查；</text>
+<text x="1000" y="692" class="">沿原 Fiber 开始加载。</text>
+<path d="M920 615 L980 615" fill="none" stroke="#b45309" stroke-width="2.5" stroke-dasharray="7 5"/>
+<polygon points="980,615 969.0,610.0 969.0,620.0" fill="#b45309"/>
+<rect x="980" y="970" width="420" height="200" rx="12" fill="white" stroke="#15803d" stroke-width="2"/>
+<text x="1000" y="1006" class="head">登记与可用有先后</text>
+<text x="1000" y="1045" class="">provide 写入 Impl；</text>
+<text x="1000" y="1079" class="">默认严格依赖查找还会</text>
+<text x="1000" y="1113" class="">检查提供者的 ACTIVE 状态。</text>
+<text x="40" y="1380" class="small">await 等待当前加载／卸载过程稳定；一般缺依赖时仍可能停在 PENDING。</text>
+<text x="40" y="1455" class="small">Cordis c261dd2 · 结构与中间阶段按固定源码归纳；本例快照及分支执行范围见 Notebook。</text>
+</svg>

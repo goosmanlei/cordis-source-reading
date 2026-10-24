@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+<title id="title">完成事件的监听登记与同步派发</title>
+<desc id="desc">通知和统计插件先通过 on 写入共享监听表。报告写入后 emit 按名称找到两个回调，通过包装调用通知和统计，然后返回。</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><path d="M0 0L9 3.5L0 7Z" fill="#42617b"/></marker></defs>
+<rect width="960" height="500" rx="16" fill="#f6f8fb"/>
+<g font-family="system-ui, sans-serif" fill="#22364b" font-size="17">
+<text x="30" y="35" font-weight="700">1. 装载时登记</text>
+<rect x="30" y="56" width="320" height="58" rx="9" fill="#deecfa"/><text x="47" y="91">notificationPlugin(ctx)</text>
+<rect x="30" y="133" width="320" height="58" rx="9" fill="#deecfa"/><text x="47" y="168">statisticsPlugin(ctx)：count = 0</text>
+<path d="M350 85H512" stroke="#42617b" fill="none" marker-end="url(#arrow)"/><path d="M350 163H512" stroke="#42617b" fill="none" marker-end="url(#arrow)"/><text x="389" y="73">ctx.on</text><text x="389" y="151">ctx.on</text>
+<rect x="525" y="56" width="405" height="135" rx="9" fill="#e1efeb"/><text x="543" y="84" font-family="monospace">_hooks["report/completed"]</text><text x="545" y="126">[0] 通知：ctx + 包装后的 callback</text><text x="545" y="165">[1] 统计：ctx + 包装后的 callback</text>
+<text x="30" y="242" font-weight="700">2. 每份报告成功写入后派发</text>
+<rect x="30" y="265" width="260" height="75" rx="9" fill="#deecfa"/><text x="48" y="294">reportBatch.apply</text><text x="48" y="320">ctx.emit(name, completed)</text>
+<path d="M290 303H358" stroke="#42617b" marker-end="url(#arrow)"/><rect x="371" y="265" width="278" height="75" rx="9" fill="#e1efeb"/><text x="387" y="294">_resolve：按 name 读取表</text><text x="387" y="320">args 留下 [completed]</text>
+<path d="M649 303H703" stroke="#42617b" marker-end="url(#arrow)"/><rect x="716" y="265" width="214" height="75" rx="9" fill="#eee5f8"/><text x="733" y="294">emit 循环调用</text><text x="733" y="320">Reflect.apply(...)</text>
+<path d="M729 191V223H510V256" stroke="#42617b" fill="none" stroke-dasharray="5 5" marker-end="url(#arrow)"/>
+<path d="M823 340V370H500V394" stroke="#42617b" fill="none" marker-end="url(#arrow)"/>
+<rect x="255" y="406" width="540" height="62" rx="9" fill="#eee5f8"/><text x="273" y="432">先经包装调用通知，再经包装调用统计</text><text x="273" y="457">两个同步回调完成 → emit 返回 reportBatch</text>
+</g></svg>

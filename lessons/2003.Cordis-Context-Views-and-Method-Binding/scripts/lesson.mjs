@@ -1,0 +1,32 @@
+// 示例运行入口：从本课一级目录执行，产物只写本课 runs/context-views。
+import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
+import { mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+const taskRoot = realpathSync(resolve(dirname(fileURLToPath(import.meta.url)), ".."));
+if (realpathSync(process.cwd()) !== taskRoot) throw new Error("请从 Cordis 2003 一级目录运行。");
+const localRequire = createRequire(resolve(taskRoot, "package.json"));
+const loader = pathToFileURL(localRequire.resolve("tsx")).href;
+const source = pathToFileURL(resolve(taskRoot, "materials/cordis/src/index.ts")).href;
+const example = pathToFileURL(resolve(taskRoot, "examples/01-context-views.mjs")).href;
+const callback = process.argv.includes("--stdin") ? readFileSync(0, "utf8").trim() : "";
+if (process.argv.includes("--stdin") && !callback) throw new Error("Notebook 未传入运行函数。");
+const runDir = resolve(taskRoot, "runs/context-views");
+rmSync(runDir, { recursive: true, force: true });
+mkdirSync(runDir, { recursive: true });
+const entry = resolve(runDir, "entry.mjs");
+const invocation = callback ? `(${callback})(cordis)` : `(await import(${JSON.stringify(example)})).default(cordis)`;
+writeFileSync(entry, `import * as cordis from ${JSON.stringify(source)};\nimport { writeFileSync } from 'node:fs';\nconst snapshots = await ${invocation};\nwriteFileSync(${JSON.stringify(resolve(runDir, "snapshot.json"))}, JSON.stringify(snapshots, null, 4) + '\\n');\n`);
+console.log("\n" + "=".repeat(60));
+console.log("案例：01 · 共享 Registry 的上下文视图与方法绑定");
+console.log("-".repeat(60));
+console.log("执行：独立 Node 进程 + 本课 tsx；加载 materials/cordis/src/index.ts");
+const result = spawnSync(process.execPath, ["--import", loader, entry], { cwd: taskRoot, encoding: "utf8" });
+writeFileSync(resolve(runDir, "stdout.log"), result.stdout ?? "");
+writeFileSync(resolve(runDir, "stderr.log"), result.stderr ?? "");
+process.stdout.write(result.stdout ?? "");
+process.stderr.write(result.stderr ?? "");
+if (result.error) throw result.error;
+if (result.status !== 0) process.exit(result.status ?? 1);

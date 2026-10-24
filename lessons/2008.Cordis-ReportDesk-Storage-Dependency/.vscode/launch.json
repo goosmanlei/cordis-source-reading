@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2008 · 01 · 存储依赖的停用与恢复",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    }
+  ]
+}

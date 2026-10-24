@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="680" viewBox="0 0 1280 680">
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="none" stroke="#556b83" stroke-width="1.5"/></marker></defs>
+<rect width="1280" height="680" fill="#f8fafc"/>
+<style>text{font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif;fill:#17324d} .title{font-size:28px;font-weight:700}.body{font-size:20px}.small{font-size:17px}.label{font-size:18px;font-weight:600}</style>
+<text x="36" y="49" class="title">同一张 reflect.store，由不同映射键选择各组实例</text>
+<text x="36" y="82" class="small">图示为两组装载完成后；reportAlpha 等是不同 Symbol 的讲解别名。</text>
+<rect x="35" y="120" width="365" height="198" rx="12" fill="#e6f1ff" stroke="#9aafc1"/>
+<text x="55" y="154" class="label">alphaCtx 及本组派生 Context</text>
+<text x="55" y="199" class="body">report  → reportAlpha</text>
+<text x="55" y="240" class="body">storage → storageAlpha</text>
+<text x="55" y="286" class="small">workspaceName = &quot;alpha&quot;</text>
+<rect x="35" y="350" width="365" height="198" rx="12" fill="#e8f7ed" stroke="#9aafc1"/>
+<text x="55" y="385" class="label">betaCtx 及本组派生 Context</text>
+<text x="55" y="429" class="body">report  → reportBeta</text>
+<text x="55" y="470" class="body">storage → storageBeta</text>
+<text x="55" y="517" class="small">workspaceName = &quot;beta&quot;</text>
+<rect x="505" y="120" width="735" height="428" rx="12" fill="#ffffff" stroke="#9aafc1"/>
+<text x="525" y="154" class="label">共享 reflect.store：Symbol → Impl</text>
+<text x="525" y="199" class="body">reportAlpha</text>
+<text x="720" y="199" class="body">→</text>
+<text x="760" y="199" class="body">Impl.value: alpha ReportService #1</text>
+<path d="M401,192 L487,192" stroke="#556b83" stroke-width="2"/><polygon points="497,192 487,187 487,197" fill="#556b83"/>
+<text x="525" y="240" class="body">storageAlpha</text>
+<text x="720" y="240" class="body">→</text>
+<text x="760" y="240" class="body">Impl.value: alpha StorageService #1</text>
+<path d="M401,233 L487,233" stroke="#556b83" stroke-width="2"/><polygon points="497,233 487,228 487,238" fill="#556b83"/>
+<text x="525" y="429" class="body">reportBeta</text>
+<text x="720" y="429" class="body">→</text>
+<text x="760" y="429" class="body">Impl.value: beta ReportService #2</text>
+<path d="M401,422 L487,422" stroke="#556b83" stroke-width="2"/><polygon points="497,422 487,417 487,427" fill="#556b83"/>
+<text x="525" y="470" class="body">storageBeta</text>
+<text x="720" y="470" class="body">→</text>
+<text x="760" y="470" class="body">Impl.value: beta StorageService #2</text>
+<path d="M401,463 L487,463" stroke="#556b83" stroke-width="2"/><polygon points="497,463 487,458 487,468" fill="#556b83"/>
+<text x="525" y="296" class="small">每项 Impl 保存 name、value、提供方 Fiber。</text>
+<text x="525" y="330" class="small">value 才是原始服务对象；业务访问可得到代理视图。</text>
+<rect x="35" y="580" width="1205" height="67" rx="12" fill="#eef1f6" stroke="#9aafc1"/>
+<text x="55" y="608" class="small">依赖准备：alpha report Fiber.store.storage → storageAlpha 对应 Impl</text>
+<text x="55" y="634" class="small">                         beta report Fiber.store.storage  → storageBeta 对应 Impl</text>
+</svg>

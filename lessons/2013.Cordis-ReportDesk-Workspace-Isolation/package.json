@@ -1,0 +1,18 @@
+{
+    "name": "cordis-2013-reportdesk-workspace-isolation",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prepare": "node scripts/prepare-cordis.mjs",
+        "check": "npm run prepare && tsc --noEmit",
+        "demo": "node shared/run-demo.mjs"
+    },
+    "dependencies": {
+        "cordis": "file:materials/cordis"
+    },
+    "devDependencies": {
+        "@types/node": "26.0.0",
+        "tsx": "4.23.15",
+        "typescript": "6.0.3"
+    }
+}

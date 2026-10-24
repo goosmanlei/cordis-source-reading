@@ -1,0 +1,19 @@
+{
+    "name": "cordis-2006-reportdesk-events-and-observers",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "prepare": "node scripts/prepare-cordis.mjs",
+        "check": "npm run prepare && tsc --noEmit",
+        "demo:start": "node --import tsx examples/01-reportdesk/start.ts",
+        "demo": "node --import tsx examples/01-reportdesk/main.ts"
+    },
+    "dependencies": {
+        "cordis": "file:materials/cordis"
+    },
+    "devDependencies": {
+        "@types/node": "26.0.0",
+        "tsx": "4.23.15",
+        "typescript": "6.0.3"
+    }
+}

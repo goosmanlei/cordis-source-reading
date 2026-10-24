@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
+  <title id="title">generate 调用中的 this 与 Context</title>
+  <desc id="desc">shadow 代理以 reportView 为目标，reportView 指向原始 ReportService。shadow 的 ctx 返回 methodCtx，其原型是调用方 Context，其 symbols.shadow 指向 reportProvider 的 Context。标签沿原型读取，storage 依赖按定义处 Fiber 查找。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#556477"/></marker>
+    <style>text{font-family:Arial,"PingFang SC","Microsoft YaHei",sans-serif;fill:#172a41;font-size:16px}.title{font-size:24px;font-weight:700}.name{font-size:20px;font-weight:700}.small{font-size:14px;fill:#465970}.box{stroke-width:1.6;rx:12}.line{fill:none;stroke:#556477;stroke-width:2;marker-end:url(#arrow)}.label{fill:#465970;font-size:15px}</style>
+  </defs>
+  <rect width="1000" height="650" fill="#fafcff"/>
+  <text x="35" y="42" class="title">一次 reportView.generate(...) 调用</text>
+  <text x="35" y="72" class="small">apply 条件成立时：thisArg 从 reportView 换为 shadow；原始服务未被重新创建</text>
+
+  <rect class="box" x="35" y="108" width="240" height="108" fill="#e8f3ff" stroke="#4a82bb"/>
+  <text x="55" y="140" class="name">shadow（方法 this）</text>
+  <text x="55" y="170">读取 ctx → methodCtx</text>
+  <text x="55" y="196" class="small">withProps 创建的额外代理</text>
+  <rect class="box" x="365" y="108" width="240" height="108" fill="#eef4fc" stroke="#6885ac"/>
+  <text x="385" y="140" class="name">reportView</text>
+  <text x="385" y="170">调用方取得的服务视图</text>
+  <text x="385" y="196" class="small">generate 的读取进入 get</text>
+  <rect class="box" x="695" y="108" width="270" height="108" fill="#f5efff" stroke="#9471b8"/>
+  <text x="715" y="140" class="name">原始 ReportService</text>
+  <text x="715" y="170">config、instanceId 仍共享</text>
+  <text x="715" y="196" class="small">自身 ctx 保存 reportProvider 的 ctx</text>
+  <path class="line" d="M275 160H365"/><text x="291" y="147" class="label">代理目标</text>
+  <path class="line" d="M605 160H695"/><text x="621" y="147" class="label">代理目标</text>
+
+  <rect class="box" x="35" y="310" width="280" height="115" fill="#e8f3ff" stroke="#4a82bb"/>
+  <text x="55" y="344" class="name">methodCtx（派生 Context）</text>
+  <text x="55" y="375">自身属性：symbols.shadow</text>
+  <text x="55" y="403" class="small">没有复制调用方的 entryLabel / fiber</text>
+  <rect class="box" x="380" y="515" width="260" height="105" fill="#e9f7f1" stroke="#519782"/>
+  <text x="400" y="548" class="name">调用方 ctx</text>
+  <text x="400" y="577">entryLabel：manual / scheduled</text>
+  <text x="400" y="603" class="small">reportBatch 的 Fiber：inject report</text>
+  <rect class="box" x="695" y="310" width="270" height="115" fill="#f5efff" stroke="#9471b8"/>
+  <text x="715" y="344" class="name">reportProvider 的 ctx</text>
+  <text x="715" y="375">定义处 Fiber：inject storage</text>
+  <text x="715" y="403" class="small">fiber.store.storage → 存储实现</text>
+  <path class="line" d="M155 216V310"/><text x="170" y="270" class="label">覆盖读取 ctx</text>
+  <path class="line" d="M830 216V310"/><text x="845" y="270" class="label">自身 ctx</text>
+  <path class="line" d="M315 365H695"/><text x="350" y="348" class="label">symbols.shadow 持有定义处</text>
+  <text x="350" y="393" class="small">storage 查找从 defSite.fiber 开始</text>
+  <path class="line" d="M175 425V565H380" stroke-dasharray="7 5"/>
+  <text x="191" y="490" class="label">原型指向调用方</text>
+  <text x="191" y="516" class="small">entryLabel / fiber 沿原型取得</text>
+</svg>

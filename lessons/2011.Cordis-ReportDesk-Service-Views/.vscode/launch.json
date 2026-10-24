@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2011 · 01 · 共享服务与调用视图",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false,
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      }
+    }
+  ]
+}

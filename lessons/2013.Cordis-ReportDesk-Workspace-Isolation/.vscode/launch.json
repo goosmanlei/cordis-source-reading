@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cordis 2013 · 01 · 两个独立工作区",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/01-reportdesk/main.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": [
+        "--import",
+        "tsx"
+      ],
+      "env": {
+        "TSX_DISABLE_CACHE": "1"
+      },
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "smartStep": false
+    }
+  ]
+}

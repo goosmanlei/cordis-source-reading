@@ -1,0 +1,21 @@
+{
+    "name": "cordis-context-and-function-plugins-lesson",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "check": "npm run prepare:cordis && tsc --noEmit",
+        "demo": "node scripts/lesson.mjs demo",
+        "plugin": "node scripts/lesson.mjs 01",
+        "identity": "node scripts/lesson.mjs 02",
+        "async": "node scripts/lesson.mjs 03",
+        "prepare:cordis": "tsc -p materials/cordis/tsconfig.json"
+    },
+    "dependencies": {
+        "cordis": "file:materials/cordis"
+    },
+    "devDependencies": {
+        "@types/node": "26.0.0",
+        "tsx": "4.23.15",
+        "typescript": "6.0.3"
+    }
+}

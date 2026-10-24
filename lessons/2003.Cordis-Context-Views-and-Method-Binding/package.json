@@ -1,0 +1,22 @@
+{
+    "name": "cordis-2003-context-views-and-method-binding",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "demo": "node --import tsx examples/01-m1-context-branches.mjs",
+        "check": "npm run prepare:cordis && node --check scripts/lesson.mjs && node --check examples/01-context-views.mjs && node --check shared/run-fragment.cjs && node --check shared/is-direct-entry.mjs && npm run check:examples",
+        "prepare:cordis": "tsc -p materials/cordis/tsconfig.json",
+        "demo:m1": "node --import tsx examples/01-m1-context-branches.mjs",
+        "demo:shadow": "node --import tsx examples/01-m1-shadow-extend.mjs",
+        "check:examples": "node scripts/check-example-parity.mjs",
+        "demo:shadow-application": "node --import tsx examples/02-shadow-application.mjs"
+    },
+    "dependencies": {
+        "cordis": "file:materials/cordis"
+    },
+    "devDependencies": {
+        "@types/node": "26.0.0",
+        "tsx": "4.23.15",
+        "typescript": "6.0.3"
+    }
+}
